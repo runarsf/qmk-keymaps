@@ -28,6 +28,9 @@ while test "${#}" -gt "0"; do
     -s|--silent)
       silent='true'
       shift;;
+    -*|--*)
+      printf "Unknown option '${1}'\n"
+      shift;;
     *)
       positional+=("${1}")
       shift;;
