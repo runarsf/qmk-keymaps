@@ -1,0 +1,92 @@
+<!-- https://www.reddit.com/r/olkb/comments/96cyb6/how_to_edit_my_configh_file_from_either_my_json/?utm_source=share&utm_medium=web2x&context=3 -->
+<!-- https://pastebin.com/y5dwRWm6 -->
+<html>
+
+<head>
+
+</head>
+
+<body>
+  <h2>Config.Qmk.Fm Json file</h2>
+  <textarea id="configFile" class="fullWidth"></textarea>
+  <br>
+  <br>
+  <h2>Keymap.c</h2>
+  <label>Keyboard</label>
+  <br>
+  <input id="infoKeyboard" disabled>
+  <br>
+  <label>Keymap Name</label>
+  <br>
+  <input id="infoKeymapName" disabled>
+  <br>
+  <label>Layout Name</label>
+  <br>
+  <input id="infoLayoutName" disabled>
+  <br>
+  <label>Layers</label>
+  <br>
+  <input id="infoNumLayers" disabled>
+  <br>
+  <label>Output Keymap.c</label>
+  <br>
+  <textarea id="keymap" class="fullWidth" disabled></textarea>
+
+  <style>
+    .fullWidth {
+      width: 100%;
+      height: 200px;
+      white-space: pre;
+      overflow: scroll;
+    }
+  </style>
+
+  <script>
+    // On load
+    document.addEventListener("DomContentLoaded", setup, false);
+    window.onload = setup;
+
+    // DOM
+    var configFile, infoKeyboard, infoKeymapName, infoLayoutName, infoNumLayers, Keymap;
+
+    function setup() {
+      configFile = document.getElementById("configFile");
+      infoKeyboard = document.getElementById("infoKeyboard");
+      infoKeymapName = document.getElementById("infoKeymapName");
+      infoLayoutName = document.getElementById("infoLayoutName");
+      infoNumLayers = document.getElementById("infoNumLayers");
+      outputKeymap = document.getElementById("keymap");
+
+      // Listen for load button
+      configFile.addEventListener("input", function () {
+        ConfigToC(configFile.value);
+      });
+    }
+
+    function ConfigToC(configString) {
+      let json = JSON.parse(configString);
+
+      let keyboard = json["keyboard"];
+      let keymap = json["keymap"];
+      let layout = json["layout"];
+      let layers = json["layers"];
+
+      let output = `const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+${layers.map((layer, i) => `    [` + i + `] = ` + layout + `(` + layer.map((key, j) => key).join(", ") + `)`).join(",\n")}
+};`;
+
+      SetOutput(keyboard, keymap, layout, layers.length, output);
+    }
+
+    function SetOutput(keyboard, keymapName, layoutName, numLayers, keymap) {
+      infoKeyboard.value = keyboard;
+      infoKeymapName.value = keymapName;
+      infoLayoutName.value = layoutName;
+      infoNumLayers.value = numLayers;
+      outputKeymap.value = keymap;
+    }
+  </script>
+
+</body>
+
+</html>

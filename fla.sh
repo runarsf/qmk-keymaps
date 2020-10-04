@@ -73,6 +73,7 @@ usage() { # {{{
 } # }}}
 
 # Argument parsing {{{
+# TODO: Check if zsa firmware should be used for planck_ez https://github.com/zsa/qmk_firmware/
 # TODO: Consider using a default QMK user instead of forcing the user to provide one
 QMK_FIRMWARE_FOLDER='qmk_firmware'
 positional=()
@@ -180,8 +181,9 @@ mkdir -p "${QMK_FIRMWARE_FOLDER}/keyboards/${TARGET_KEYBOARD}/keymaps/${QMK_USER
 printf "Copying keymap: ${TARGET_LAYOUT}/{config.h,keymap.c,rules.mk} -> ${QMK_FIRMWARE_FOLDER}/keyboards/${TARGET_KEYBOARD}/keymaps/${QMK_USER}/\n"
 rsync --archive --verbose --human-readable ${TARGET_LAYOUT}/{config.h,keymap.c,rules.mk} ${QMK_FIRMWARE_FOLDER}/keyboards/${TARGET_KEYBOARD}/keymaps/${QMK_USER}/
 
-printf "Copying common: ./common -> ./${QMK_FIRMWARE_FOLDER}/users/${QMK_USER}/\n"
-rsync --archive --verbose --human-readable --delete ./common/ "./${QMK_FIRMWARE_FOLDER}/users/${QMK_USER}/" >/dev/null 2>&1
+# Used for shared/common configurations
+#printf "Copying common: ./common -> ./${QMK_FIRMWARE_FOLDER}/users/${QMK_USER}/\n"
+#rsync --archive --verbose --human-readable --delete ./common/ "./${QMK_FIRMWARE_FOLDER}/users/${QMK_USER}/" >/dev/null 2>&1
 
 printf "Initializing submodules\n"
 make --directory="${QMK_FIRMWARE_FOLDER}" git-submodule >/dev/null 2>&1
