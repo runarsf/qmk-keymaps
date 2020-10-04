@@ -5,6 +5,10 @@
 #set -o nounset   # abort on unbound variable
 #set -o pipefail  # don't hide errors within pipes
 #set -o noclobber # disallow redirect overwriting
+
+__dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)" # /home/user/deploy
+#__file="${__dir}/$(basename "${BASH_SOURCE[0]}")"                     # /home/user/deploy/deploy.sh
+#__base="$(basename ${__file} .sh)"                                    # deploy
 # }}}
 
 # Colours {{{
@@ -189,20 +193,20 @@ cd "${QMK_FIRMWARE_FOLDER}"
 
 if test -z "${PODMAN}"; then
   if test -n "${FLASH}"; then
-    printf "Building and flashing ${MAKE_PREFIX}:${QMK_USER}\n"
+    printf "Building and flashing (docker) ${MAKE_PREFIX}:${QMK_USER}\n"
     ./util/docker_build.sh "${MAKE_PREFIX}:${QMK_USER}${MAKE_SUFFIX}"
   else
-    printf "Building ${MAKE_PREFIX}:${QMK_USER}\n"
+    printf "Building (docker) ${MAKE_PREFIX}:${QMK_USER}\n"
     ./util/docker_build.sh "${MAKE_PREFIX}:${QMK_USER}"
   fi
 else
-  # use own podman_build.sh script
-  #rsync --archive --verbose --human-readable --delete ../podman_build.sh ./util/
+  printf "Copying podman_build.sh: ${__dir}/podman_build.sh -> ./util/"
+  rsync --archive --verbose --human-readable --delete "${__dir}/podman_build.sh" ./util/
   if test -n "${FLASH}"; then
-    printf "building and flashing ${MAKE_PREFIX}:${QMK_USER}\n"
+    printf "Building and flashing (podman) ${MAKE_PREFIX}:${QMK_USER}\n"
     ./util/podman_build.sh "${MAKE_PREFIX}:${QMK_USER}${MAKE_SUFFIX}"
   else
-    printf "building ${MAKE_PREFIX}:${QMK_USER}\n"
+    printf "Building (podman) ${MAKE_PREFIX}:${QMK_USER}\n"
     ./util/podman_build.sh "${MAKE_PREFIX}:${QMK_USER}"
   fi
 fi
