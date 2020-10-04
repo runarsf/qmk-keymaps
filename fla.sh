@@ -1,21 +1,82 @@
 #!/usr/bin/env bash
-# TODO: expand variables in debug and why tf does it expand newlines...
-printf "\e[94m[run-order|line number>|function:function-call] \e[4mcommand\e[0m\n"
-trap 'printf "\e[94m[$((runlineno+=1))|${LINENO}|${FUNCNAME[1]:-0}:${BASH_LINENO[0]}] \e[4m${BASH_COMMAND}\e[0m\n"; read -n 1 -s -r' DEBUG
+# vim: set foldmethod=marker nomodeline:
+# Initialization {{{
+#set -o errexit   # abort on nonzero exit status
+#set -o nounset   # abort on unbound variable
+#set -o pipefail  # don't hide errors within pipes
+#set -o noclobber # disallow redirect overwriting
+# }}}
 
-usage () {
-  printf "heLP!\n"
-}
+# Colours {{{
+RESET=$'\e[0;39m'
 
-# if you don't have the submodule already
-#   git submodule add https://github.com/qmk/qmk_firmware.git
-# then - or if you already have the submodule but not updated/pulled it (--recursive might not be needed, since we update it using make later)
-#   git submodule update --init --recursive
+E_UNDERLINE=$'\e[4m'
 
+C_DEFAULT=$'\e[19m'
+C_BLACK=$'\e[30m'
+C_RED=$'\e[31m'
+C_GREEN=$'\e[32m'
+C_YELLOW=$'\e[33m'
+C_BLUE=$'\e[34m'
+C_MAGENTA=$'\e[35m'
+C_CYAN=$'\e[36m'
+C_LGRAY=$'\e[37m'
+C_DGRAY=$'\e[90m'
+C_LRED=$'\e[91m'
+C_LGREEN=$'\e[92m'
+C_LYELLOW=$'\e[93m'
+C_LBLUE=$'\e[94m'
+C_LMAGENTA=$'\e[95m'
+C_LCYAN=$'\e[96m'
+C_WHITE=$'\e[97m'
+# }}}
+
+# Debug {{{
+# FIXME: expand variables in debug and why tf does it expand newlines...
+#printf "\e[94m[run-order|line number>|function:function-call] \e[4mcommand\e[0m\n"
+#trap 'printf "\e[94m[$((runlineno+=1))|${LINENO}|${FUNCNAME[1]:-0}:${BASH_LINENO[0]}] \e[4m${BASH_COMMAND}\e[0m\n"; read -n 1 -s -r' DEBUG
+# }}}
+
+usage() { # {{{
+	cat <<-EOMAN
+	${RESET}${C_GREEN}Usage:${RESET} ${0}       <${C_RED}options${RESET}>   [${C_BLUE}layout${RESET}]
+	
+	${C_GREEN}Options:${RESET}
+	  -h, --help                      Display usage menu.
+	  -u, --user         <${C_RED}username${RESET}> ${C_RED}!${RESET} QMK user.
+	  -f, --fw-folder   <${C_RED}directory${RESET}>   qmk_firmware folder location.
+	  -p, --podman                    Build using podman instead of docker.
+	  -f, --flash                     Flash and build.
+	  --keyboard         <${C_RED}keyboard${RESET}> ${C_YELLOW}*${RESET} Keyboard.
+	  --make-prefix        <${C_RED}prefix${RESET}> ${C_YELLOW}*${RESET} Make prefix.
+	  --make-suffix        <${C_RED}suffix${RESET}> ${C_YELLOW}*${RESET} Make suffix.
+	  --image-extension <${C_RED}extension${RESET}> ${C_YELLOW}*${RESET} Image extension.
+	${C_GREEN}Layouts:${RESET}
+	  preonic
+	  planck
+	${C_GREEN}Examples:${RESET}
+	  ${0} ${C_RED}--user runarsf ${C_BLUE}planck${RESET}
+	  ${0} ${C_RED}--user runarsf ${C_BLUE}preonic ${C_RED}--flash${RESET}
+	${RESET}
+	Options marked with ${C_RED}!${RESET} are required.
+	Options marked with ${C_YELLOW}*${RESET} are required ${E_UNDERLINE}if${RESET} you provide an undefined layout.
+	
+	Initialize the qmk_firmware folder/submodule:
+	  git submodule add https://github.com/qmk/qmk_firmware.git
+	  git submodule update --init --recursive
+	${RESET}
+	EOMAN
+} # }}}
+
+# Argument parsing {{{
+# TODO: Consider using a default QMK user instead of forcing the user to provide one
 QMK_FIRMWARE_FOLDER='qmk_firmware'
 positional=()
 while test "${#}" -gt "0"; do
   case "${1}" in
+    -h|--help)
+      usage
+      exit 0;;
     -u|--user)
       QMK_USER="${2}"
       shift;shift;;
@@ -61,17 +122,17 @@ done
 
 set -- "${positional[@]}"
 
-if test -z "${QMK_USER}"; then usage && exit 1; fi
+if test -z "${QMK_USER}"; then printf "Required argument -u|--user not provided.\nSee --help for more info.\n" && exit 1; fi
 
 if test "${#}" -gt "1"; then
-  printf "Too many arguments, expected target layout.\n"
+  printf "Too many arguments, expected target layout.\nSee --help for more info.\n"
   exit 1
 elif test "${#}" -lt "1"; then
-  printf "Too few arguments, expected target layout.\n"
+  printf "Too few arguments, expected target layout.\nSee --help for more info.\n"
   exit 1
 fi
+# }}}
 
-# preonic
 TARGET_LAYOUT="${1}"
 
 if test -z "${KEYBOARD}" -o -z "${MAKE_PREFIX}" -o -z "${MAKE_SUFFIX}" -o -z "${IMAGE_EXTENSION}"; then
@@ -89,7 +150,7 @@ if test -z "${KEYBOARD}" -o -z "${MAKE_PREFIX}" -o -z "${MAKE_SUFFIX}" -o -z "${
       MAKE_SUFFIX=':dfu-util-wait'
       ;;
     *)
-      printf "\n"
+      printf "Undefined layout '${TARGET_LAYOUT}' found, and missing required options.\n"
       exit 1
       ;;
   esac

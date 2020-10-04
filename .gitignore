@@ -1,0 +1,5 @@
+# Not sure if this should actually be ignored
+qmk_firmware/
+qmk_firmware/*
+# a local workspace
+workspace/
