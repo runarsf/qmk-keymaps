@@ -1,8 +1,16 @@
 #!/usr/bin/env bash
+# TODO: expand variables in debug and why tf does it expand newlines...
+printf "\e[94m[run-order|line number>|function:function-call] \e[4mcommand\e[0m\n"
+trap 'printf "\e[94m[$((runlineno+=1))|${LINENO}|${FUNCNAME[1]:-0}:${BASH_LINENO[0]}] \e[4m${BASH_COMMAND}\e[0m\n"; read -n 1 -s -r' DEBUG
 
 usage () {
-  printf "heLP!"
+  printf "heLP!\n"
 }
+
+# if you don't have the submodule already
+#   git submodule add https://github.com/qmk/qmk_firmware.git
+# then - or if you already have the submodule but not updated/pulled it (--recursive might not be needed, since we update it using make later)
+#   git submodule update --init --recursive
 
 QMK_FIRMWARE_FOLDER='qmk_firmware'
 positional=()
@@ -90,13 +98,13 @@ fi
 # preonic_runarsf.bin
 BINARY_NAME="${TARGET_LAYOUT}_${QMK_USER}.${IMAGE_EXTENSION}"
 
-if test ! -d "${QMK_FIRMWARE_FOLDER}/.git"; then
-  printf " QMK_FIRMWARE_FOLDER (${QMK_FIRMWARE_FOLDER}) does not exist or is not a git repository, get it from qmk/qmk_firmware on github.\n"
+if test ! -f "${QMK_FIRMWARE_FOLDER}/Makefile"; then
+  printf "QMK_FIRMWARE_FOLDER (${QMK_FIRMWARE_FOLDER}) does not exist or Makefile is not present, get it from qmk/qmk_firmware on github.\n"
   exit 1
 fi
 
 # Remove build folder
-printf "Deleting preexisting build-files: ${QMK_FIRMWARE_FOLDER}/.build"
+printf "Deleting preexisting build-files: ${QMK_FIRMWARE_FOLDER}/.build\n"
 rm -rf "${QMK_FIRMWARE_FOLDER}/.build"
 
 # qmk_firmware/keyboards/preonic/keymaps/runarsf
@@ -104,7 +112,7 @@ printf "Creating keymap folder: ${QMK_FIRMWARE_FOLDER}/keyboards/${TARGET_KEYBOA
 mkdir -p "${QMK_FIRMWARE_FOLDER}/keyboards/${TARGET_KEYBOARD}/keymaps/${QMK_USER}"
 
 # preonic/{config.h,keymap.c,rules.mk} qmk_firmware/keyboards/preonic/keymaps/runarsf/
-printf "Copying keymap: ${TARGET_LAYOUT}/{config.h,keymap.c,rules.mk} -> ${QMK_FIRMWARE_FOLDER}/keyboards/${TARGET_KEYBOARD}/keymaps/${QMK_USER}/"
+printf "Copying keymap: ${TARGET_LAYOUT}/{config.h,keymap.c,rules.mk} -> ${QMK_FIRMWARE_FOLDER}/keyboards/${TARGET_KEYBOARD}/keymaps/${QMK_USER}/\n"
 rsync --archive --verbose --human-readable ${TARGET_LAYOUT}/{config.h,keymap.c,rules.mk} ${QMK_FIRMWARE_FOLDER}/keyboards/${TARGET_KEYBOARD}/keymaps/${QMK_USER}/
 
 printf "Copying common: ./common -> ./${QMK_FIRMWARE_FOLDER}/users/${QMK_USER}/\n"
@@ -113,17 +121,17 @@ rsync --archive --verbose --human-readable --delete ./common/ "./${QMK_FIRMWARE_
 printf "Initializing submodules\n"
 make --directory="${QMK_FIRMWARE_FOLDER}" git-submodule >/dev/null 2>&1
 
-printf "Deleting preexisting binary: ${QMK_FIRMWARE_FOLDER}/${TARGET_LAYOUT}_${QMK_USER}.${IMAGE_EXTENSION}"
+printf "Deleting preexisting binary: ${QMK_FIRMWARE_FOLDER}/${TARGET_LAYOUT}_${QMK_USER}.${IMAGE_EXTENSION}\n"
 rm -rf "${QMK_FIRMWARE_FOLDER}/${TARGET_LAYOUT}_${QMK_USER}.${IMAGE_EXTENSION}"
 
 cd "${QMK_FIRMWARE_FOLDER}"
 
 if test -z "${PODMAN}"; then
   if test -n "${FLASH}"; then
-    printf "building and flashing ${MAKE_PREFIX}:${QMK_USER}\n"
+    printf "Building and flashing ${MAKE_PREFIX}:${QMK_USER}\n"
     ./util/docker_build.sh "${MAKE_PREFIX}:${QMK_USER}${MAKE_SUFFIX}"
   else
-    printf "building ${MAKE_PREFIX}:${QMK_USER}\n"
+    printf "Building ${MAKE_PREFIX}:${QMK_USER}\n"
     ./util/docker_build.sh "${MAKE_PREFIX}:${QMK_USER}"
   fi
 else
