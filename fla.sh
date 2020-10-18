@@ -39,16 +39,17 @@ C_WHITE=$'\e[97m'
 # FIXME: expand variables in debug and why tf does it expand newlines...
 #printf "\e[94m[run-order|line number>|function:function-call] \e[4mcommand\e[0m\n"
 #trap 'printf "\e[94m[$((runlineno+=1))|${LINENO}|${FUNCNAME[1]:-0}:${BASH_LINENO[0]}] \e[4m${BASH_COMMAND}\e[0m\n"; read -n 1 -s -r' DEBUG
+#commad -v bash_debug && bash_debug
 # }}}
 
-usage() { # {{{
+usage () { # {{{
 	cat <<-EOMAN
 	${RESET}${C_GREEN}Usage:${RESET} ${0}       <${C_RED}options${RESET}>   [${C_BLUE}layout${RESET}]
 	
 	${C_GREEN}Options:${RESET}
 	  -h, --help                      Display usage menu.
 	  -u, --user         <${C_RED}username${RESET}> ${C_RED}!${RESET} QMK user.
-	  -f, --fw-folder   <${C_RED}directory${RESET}>   qmk_firmware folder location.
+	  -w, --fw-folder   <${C_RED}directory${RESET}>   qmk_firmware folder location.
 	  -p, --podman                    Build using podman instead of docker.
 	  -f, --flash                     Flash and build.
 	  --keyboard         <${C_RED}keyboard${RESET}> ${C_YELLOW}*${RESET} Keyboard.
@@ -85,7 +86,7 @@ while test "${#}" -gt "0"; do
     -u|--user)
       QMK_USER="${2}"
       shift;shift;;
-    -f|--fw-folder)
+    -w|--fw-folder)
       QMK_FIRMWARE_FOLDER="${2}"
       shift;shift;;
     -p|--podman)
@@ -138,6 +139,7 @@ elif test "${#}" -lt "1"; then
 fi
 # }}}
 
+# Folder for build-files? ./preonic
 TARGET_LAYOUT="${1}"
 
 if test -z "${KEYBOARD}" -o -z "${MAKE_PREFIX}" -o -z "${MAKE_SUFFIX}" -o -z "${IMAGE_EXTENSION}"; then
@@ -211,4 +213,10 @@ else
     printf "Building (podman) ${MAKE_PREFIX}:${QMK_USER}\n"
     ./util/podman_build.sh "${MAKE_PREFIX}:${QMK_USER}"
   fi
+fi
+
+if test "${?}" -ne "0"; then
+  printf "Something went wrong, Make exited with code ${?}.\n"
+else
+  printf "Make finished, you can find the binaries in ${QMK_FIRMWARE_FOLDER}/.build\n"
 fi
