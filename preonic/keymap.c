@@ -20,6 +20,8 @@
 #define LSA_T(kc) MT(MOD_LSFT | MOD_LALT, kc)
 #define BP_NDSH_MAC ALGR(KC_8)
 
+// https://beta.docs.qmk.fm/using-qmk/software-features/feature_layers#switching-and-toggling-layers-id-switching-and-toggling-layers
+
 //#define LOWER MO(_LOWER)
 //#define RAISE MO(_RAISE)
 
@@ -90,7 +92,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     _______,    MI_ON,   MI_OFF,  _______, _______, MUV_DE,              MUV_IN,              _______, _______,             _______,           _______,         _______,            \
     TT(_CLEAR), _______, _______, _______, _______, KC_MEDIA_PLAY_PAUSE, KC_MEDIA_PLAY_PAUSE, _______, KC_MEDIA_PREV_TRACK, KC_AUDIO_VOL_DOWN, KC_AUDIO_VOL_UP, KC_MEDIA_NEXT_TRACK \
   ),
-
+  
+  // TODO: Replace (1,0) with DF(_SPECIAL)?
   [_SPECIAL] = LAYOUT_preonic_grid( \
     _______, _______,    _______,    _______,     _______,      _______, _______, _______,    _______,       _______,        _______, _______, \
     _______, KC_MS_BTN1, KC_MS_UP,   KC_MS_BTN2,  KC_MS_ACCEL2, KC_KP_7, KC_KP_8, KC_KP_9,    KC_MS_WH_LEFT, KC_MS_WH_RIGHT, _______, _______, \
