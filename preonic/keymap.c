@@ -2,47 +2,63 @@
 #ifdef AUDIO_ENABLE
   #include "muse.h"
 #endif
-//#include "keymap_norwegian.h"
+#include "keymap_norwegian.h"
+
+#define KC_MAC_UNDO LGUI(KC_Z)
+#define KC_MAC_CUT LGUI(KC_X)
+#define KC_MAC_COPY LGUI(KC_C)
+#define KC_MAC_PASTE LGUI(KC_V)
+#define KC_PC_UNDO LCTL(KC_Z)
+#define KC_PC_CUT LCTL(KC_X)
+#define KC_PC_COPY LCTL(KC_C)
+#define KC_PC_PASTE LCTL(KC_V)
+#define ES_LESS_MAC KC_GRAVE
+#define ES_GRTR_MAC LSFT(KC_GRAVE)
+#define ES_BSLS_MAC ALGR(KC_6)
+#define NO_PIPE_ALT KC_GRAVE
+#define NO_BSLS_ALT KC_EQUAL
+#define LSA_T(kc) MT(MOD_LSFT | MOD_LALT, kc)
+#define BP_NDSH_MAC ALGR(KC_8)
+
+//#define LOWER MO(_LOWER)
+//#define RAISE MO(_RAISE)
 
 enum preonic_layers {
   _QWERTY,
   _LOWER,
   _RAISE,
-  _ADJUST
+  _ADJUST,
+  _CLEAR,
+  _SPECIAL
 };
 
 enum preonic_keycodes {
   QWERTY = SAFE_RANGE,
   LOWER,
   RAISE,
-  ADJUST
+  ADJUST,
+  CLEAR,
+  SPECIAL
 };
 
 #define ARROW MO(_ARROW)
 #define CTL_ESC MT(MOD_LCTL, KC_ESC)
 
-/* https://beta.docs.qmk.fm/using-qmk/simple-keycodes/keycodes
+/**
+ * https://beta.docs.qmk.fm/using-qmk/simple-keycodes/keycodes
  * MUV_DE / MUV_IN are undocumented: https://github.com/qmk/qmk_firmware/issues/4616
  * https://github.com/qmk/qmk_firmware/pull/1112
  */
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [_QWERTY] = LAYOUT_preonic_grid( \
-    KC_ESC,  KC_1,    KC_2,    KC_3,    KC_4,  KC_5,   KC_6,   KC_7,  KC_8,    KC_9,    KC_0,    KC_BSPC,  \
-    KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,  KC_T,   KC_Y,   KC_U,  KC_I,    KC_O,    KC_P,    KC_DEL,   \
-    KC_TAB,  KC_A,    KC_S,    KC_D,    KC_F,  KC_G,   KC_H,   KC_J,  KC_K,    KC_L,    KC_BSLS, KC_DEL,   \
-    KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,  KC_B,   KC_N,   KC_M,  KC_COMM, KC_DOT,  KC_SLSH, KC_ENTER, \
-    KC_LCTL, KC_LCTL, KC_LGUI, KC_LALT, LOWER, KC_SPC, KC_SPC, RAISE, KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT   \
+    KC_ESC,  KC_1,         KC_2,    KC_3,    KC_4,  KC_5,   KC_6,   KC_7,  KC_8,    KC_9,    KC_0,    KC_BSPC,  \
+    KC_TAB,  KC_Q,         KC_W,    KC_E,    KC_R,  KC_T,   KC_Y,   KC_U,  KC_I,    KC_O,    KC_P,    KC_DEL,   \
+    KC_TAB,  KC_A,         KC_S,    KC_D,    KC_F,  KC_G,   KC_H,   KC_J,  KC_K,    KC_L,    KC_BSLS, KC_DEL,   \
+    KC_LSFT, KC_Z,         KC_X,    KC_C,    KC_V,  KC_B,   KC_N,   KC_M,  KC_COMM, KC_DOT,  KC_SLSH, KC_ENTER, \
+    KC_LCTL, TT(_SPECIAL), KC_LGUI, KC_LALT, LOWER, KC_SPC, KC_SPC, RAISE, KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT   \
   ),
 
   /*
-  [_LOWER] = LAYOUT_preonic_grid( \
-    KC_TILD, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_BSPC, \
-    KC_TILD, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_DEL, \
-    KC_DEL,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   _______, _______, _______, _______, _______, _______, KC_ENTER, \
-    _______, KC_F7,   KC_F8,   KC_F9,   KC_F10,  _______, _______, _______, _______, _______, KC_END,  _______, \
-    _______, _______, _______, _______, _______, _______, _______, _______, KC_MPLY, KC_VOLD, KC_VOLU, KC_MNXT \
-  ),
-  */
   [_LOWER] = LAYOUT_preonic_grid( \
     S(KC_EQL), KC_EXLM, ALGR(KC_2), KC_HASH, ALGR(KC_4), KC_PERC, S(KC_6), S(KC_7), ALGR(KC_RBRC), S(KC_0),    KC_MINS, _______, \
     KC_TILD,   KC_EXLM, KC_AT,      KC_HASH, KC_DLR,     KC_PERC, KC_CIRC, KC_AMPR, KC_ASTR,       KC_LPRN,    KC_RPRN, KC_DEL,  \
@@ -50,22 +66,46 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     _______,   _______, _______,    _______, _______,    _______, _______, _______, _______,       _______,    _______, _______, \
     _______,   _______, _______,    _______, _______,    KC_SPC,  KC_SPC,  _______, KC_HOME,       KC_PGDN,    KC_PGUP, KC_END   \
   ),
+  */
+  [_LOWER] = LAYOUT_preonic_grid( \
+    NO_GRV,  KC_EXLM, NO_AT,   KC_HASH, NO_DLR,  KC_PERC, NO_AMPR, NO_SLSH, NO_TILD, NO_EQL,  NO_PLUS,        KC_BSPC, \
+    NO_GRV,  KC_EXLM, NO_AT,   KC_HASH, NO_DLR,  KC_PERC, NO_AMPR, NO_SLSH, NO_TILD, NO_EQL,  NO_PLUS,        KC_DEL,  \
+    _______, NO_BSLS, NO_QUO2, _______, NO_EURO, _______, _______, NO_QUOT, NO_LBRC, NO_RBRC, KC_KP_ASTERISK, _______, \
+    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,        _______, \
+    _______, _______, _______, _______, _______, KC_SPC,  KC_SPC,  _______, KC_HOME, KC_PGDN, KC_PGUP,        KC_END   \
+  ),
 
   [_RAISE] = LAYOUT_preonic_grid( \
-    KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,          KC_8,       KC_9,       KC_0,       KC_LBRC , \
-    KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,          KC_8,       KC_9,       KC_0,       KC_LBRC , \
-    _______, _______, KC_NUHS, _______, _______, _______, _______, S(ALGR(KC_7)), ALGR(KC_7), ALGR(KC_0), KC_SCLN,    KC_QUOT,  \
-    _______, _______, _______, _______, _______, _______, _______, _______,       KC_NUBS,    S(KC_NUBS), S(KC_RBRC), _______,  \
-    _______, _______, _______, _______, ADJUST,  KC_SPC,  KC_SPC,  ADJUST,        KC_HOME,    KC_PGDN,    KC_PGUP,    KC_END    \
+    NO_PIPE_ALT, KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,        KC_8,    KC_9,    KC_0,    NO_AM ,  \
+    NO_PIPE_ALT, KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,        KC_8,    KC_9,    KC_0,    NO_AM ,  \
+    _______,     _______, NO_QUOT, _______, _______, _______, _______, NO_BSLS_ALT, NO_LCBR, NO_RCBR, NO_AE,   NO_OSLH, \
+    _______,     _______, _______, _______, _______, _______, _______, _______,     NO_LESS, NO_GRTR, NO_CIRC, _______, \
+    _______,     _______, _______, _______, _______, KC_SPC,  KC_SPC,  _______,     KC_HOME, KC_PGDN, KC_PGUP, KC_END   \
   ),
 
   [_ADJUST] = LAYOUT_preonic_grid( \
-    KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,    KC_F10,  KC_F11,  KC_F12,  \
-    _______, RESET,   DEBUG,   _______, _______, _______, _______, TERM_ON, TERM_OFF, _______, _______, _______,  \
-    _______, KC_INS,  MU_MOD,  AU_ON,   AU_OFF,  AG_NORM, AG_SWAP, QWERTY,  _______,  _______, _______, _______, \
-    _______, MUV_DE,  MUV_IN,  MU_ON,   MU_OFF,  MI_ON,   MI_OFF,  _______, _______,  _______, _______, _______, \
-    _______, _______, _______, _______, _______, _______, _______, _______, _______,  _______, _______, _______  \
-  )
+    KC_F1,      KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,               KC_F7,               KC_F8,   KC_F9,               KC_F10,            KC_F11,          KC_F12,             \
+    _______,    RESET,   DEBUG,   _______, _______, _______,             _______,             TERM_ON, TERM_OFF,            _______,           _______,         _______,            \
+    _______,    KC_INS,  MU_MOD,  AU_ON,   AU_OFF,  AG_NORM,             AG_SWAP,             QWERTY,  _______,             _______,           _______,         _______,            \
+    _______,    MUV_DE,  MUV_IN,  MU_ON,   MU_OFF,  MI_ON,               MI_OFF,              _______, _______,             _______,           _______,         _______,            \
+    TT(_CLEAR), _______, _______, _______, _______, KC_MEDIA_PLAY_PAUSE, KC_MEDIA_PLAY_PAUSE, _______, KC_MEDIA_PREV_TRACK, KC_AUDIO_VOL_DOWN, KC_AUDIO_VOL_UP, KC_MEDIA_NEXT_TRACK \
+  ),
+
+  [_SPECIAL] = LAYOUT_preonic_grid( \
+    _______, _______,    _______,    _______,     _______,      _______, _______, _______,    _______,       _______,        _______, _______, \
+    _______, KC_MS_BTN1, KC_MS_UP,   KC_MS_BTN2,  KC_MS_ACCEL2, KC_KP_7, KC_KP_8, KC_KP_9,    KC_MS_WH_LEFT, KC_MS_WH_RIGHT, _______, _______, \
+    _______, KC_MS_LEFT, KC_MS_DOWN, KC_MS_RIGHT, KC_MS_ACCEL1, KC_KP_4, KC_KP_5, KC_KP_6,    KC_MS_WH_DOWN, KC_MS_WH_UP,    _______, _______, \
+    _______, KC_MS_BTN4, KC_MS_BTN3, KC_MS_BTN5,  KC_MS_ACCEL0, KC_KP_1, KC_KP_2, KC_KP_3,    _______,       _______,        _______, _______, \
+    _______, _______,    _______,    _______,     KC_MS_BTN1,   KC_KP_0, KC_NO,   KC_NUMLOCK, _______,       _______,        _______, _______  \
+  ),
+
+  [_CLEAR] = LAYOUT_preonic_grid( \
+    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
+    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
+    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
+    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
+    _______, _______, _______, _______, _______, RESET,   RESET,   _______, _______, _______, _______, _______  \
+  ),
 };
 
 /* https://beta.docs.qmk.fm/using-qmk/guides/custom_quantum_functions#example-process_record_user-implementation
