@@ -70,7 +70,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   ),
   */
   [_LOWER] = LAYOUT_preonic_grid( \
-    NO_GRV,  KC_EXLM, NO_AT,   KC_HASH, NO_DLR,  KC_PERC, NO_AMPR, NO_SLSH, NO_TILD, NO_EQL,  NO_PLUS,        KC_BSPC, \
+    NO_GRV,  KC_EXLM, NO_AT,   KC_HASH, NO_DLR,  KC_PERC, NO_AMPR, NO_SLSH, NO_TILD, NO_EQL,  KC_BSPC,        NO_PLUS, \
     NO_GRV,  KC_EXLM, NO_AT,   KC_HASH, NO_DLR,  KC_PERC, NO_AMPR, NO_SLSH, NO_TILD, NO_EQL,  NO_PLUS,        KC_DEL,  \
     _______, NO_BSLS, NO_QUO2, _______, NO_EURO, _______, _______, NO_QUOT, NO_LBRC, NO_RBRC, KC_KP_ASTERISK, _______, \
     _______, _______, _______, _______, _______, _______, _______, _______, NO_LESS, NO_GRTR, NO_CIRC,        _______, \
