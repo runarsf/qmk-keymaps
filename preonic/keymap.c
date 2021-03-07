@@ -60,18 +60,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_LCTL, TT(_SPECIAL), KC_LGUI, KC_LALT, LOWER, KC_SPC, KC_SPC, RAISE, KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT
   ),
 
-  /*
   [_LOWER] = LAYOUT_preonic_grid(
-    S(KC_EQL), KC_EXLM, ALGR(KC_2), KC_HASH, ALGR(KC_4), KC_PERC, S(KC_6), S(KC_7), ALGR(KC_RBRC), S(KC_0),    KC_MINS, _______,
-    KC_TILD,   KC_EXLM, KC_AT,      KC_HASH, KC_DLR,     KC_PERC, KC_CIRC, KC_AMPR, KC_ASTR,       KC_LPRN,    KC_RPRN, KC_DEL,
-    _______,   _______, KC_NUHS,    _______, _______,    _______, _______, _______, ALGR(KC_8),    ALGR(KC_9), _______, _______,
-    _______,   _______, _______,    _______, _______,    _______, _______, _______, _______,       _______,    _______, _______,
-    _______,   _______, _______,    _______, _______,    KC_SPC,  KC_SPC,  _______, KC_HOME,       KC_PGDN,    KC_PGUP, KC_END
-  ),
-  */
-  [_LOWER] = LAYOUT_preonic_grid(
-    NO_GRV,  KC_EXLM, NO_AT,   KC_HASH, NO_DLR,  KC_PERC, NO_AMPR, NO_SLSH, NO_TILD, NO_EQL,  KC_BSPC,        NO_PLUS,
-    NO_GRV,  KC_EXLM, NO_AT,   KC_HASH, NO_DLR,  KC_PERC, NO_AMPR, NO_SLSH, NO_TILD, NO_EQL,  NO_PLUS,        KC_DEL,
+    NO_GRV,  KC_EXLM, NO_AT,   KC_HASH, NO_DLR,  KC_PERC, NO_AMPR, NO_SLSH, NO_TILD, NO_EQL,  NO_PLUS,        KC_BSPC,
+    NO_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,           KC_DEL,
     _______, NO_BSLS, NO_QUO2, _______, NO_EURO, _______, _______, NO_QUOT, NO_LBRC, NO_RBRC, KC_KP_ASTERISK, _______,
     _______, _______, _______, _______, _______, _______, _______, _______, NO_LESS, NO_GRTR, NO_CIRC,        _______,
     _______, _______, _______, _______, _______, KC_SPC,  KC_SPC,  _______, KC_HOME, KC_PGDN, KC_PGUP,        KC_END
@@ -92,7 +83,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     _______,    MI_ON,   MI_OFF,  _______, _______, MUV_DE,              MUV_IN,              _______, _______,             _______,           _______,         _______,
     TT(_CLEAR), _______, _______, _______, _______, KC_MEDIA_PLAY_PAUSE, KC_MEDIA_PLAY_PAUSE, _______, KC_MEDIA_PREV_TRACK, KC_AUDIO_VOL_DOWN, KC_AUDIO_VOL_UP, KC_MEDIA_NEXT_TRACK
   ),
-  
+
   // TODO: Replace (1,0) with DF(_SPECIAL)?
   [_SPECIAL] = LAYOUT_preonic_grid(
     _______, _______,    _______,    _______,     _______,      _______, _______, _______,    _______,       _______,        _______, _______,
@@ -113,12 +104,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * | Exit |      |      |   A  |   O  |             |   E  |   U  |      |      |      |
    * `-----------------------------------------------------------------------------------'
    */
+  /*
   [_PLOVER] = LAYOUT_planck_grid(
     KC_1,    KC_1,    KC_1,    KC_1,    KC_1,    KC_1,    KC_1,    KC_1,    KC_1,    KC_1,    KC_1,    KC_1   ,
     _______, KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC,
     _______, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,
     EXT_PLV, _______, _______, KC_C,    KC_V,    _______, _______, KC_N,    KC_M,    _______, _______, _______
   ),
+  */
 
   [_CLEAR] = LAYOUT_preonic_grid(
     _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, DEBUG,

@@ -142,7 +142,10 @@ fi
 # Folder for build-files? ./preonic
 TARGET_LAYOUT="${1}"
 
-if test -z "${KEYBOARD}" -o -z "${MAKE_PREFIX}" -o -z "${MAKE_SUFFIX}" -o -z "${IMAGE_EXTENSION}"; then
+if test -z "${KEYBOARD}" \
+     -o -z "${MAKE_PREFIX}" \
+     -o -z "${MAKE_SUFFIX}" \
+     -o -z "${IMAGE_EXTENSION}"; then
   case "${TARGET_LAYOUT}" in
     preonic)
       TARGET_KEYBOARD='preonic'
@@ -215,8 +218,9 @@ else
   fi
 fi
 
-if test "${?}" -ne "0"; then
-  printf "Something went wrong, Make exited with code ${?}.\n"
+makeExit="${?}"
+if test "${makeExit}" -ne "0"; then
+  printf "Something went wrong, Make exited with code ${makeExit}.\n"
 else
   printf "Make finished, you can find the binaries in ${QMK_FIRMWARE_FOLDER}/.build\n"
 fi
