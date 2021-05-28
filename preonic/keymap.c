@@ -19,6 +19,9 @@
 #define NO_BSLS_ALT KC_EQUAL
 #define LSA_T(kc) MT(MOD_LSFT | MOD_LALT, kc)
 #define BP_NDSH_MAC ALGR(KC_8)
+#define ARROW MO(_ARROW)
+#define CTL_ESC MT(MOD_LCTL, KC_ESC)
+#define POST_UMLAUT UC(0x0308)
 
 // https://beta.docs.qmk.fm/using-qmk/software-features/feature_layers#switching-and-toggling-layers-id-switching-and-toggling-layers
 
@@ -43,9 +46,6 @@ enum preonic_keycodes {
   SPECIAL
 };
 
-#define ARROW MO(_ARROW)
-#define CTL_ESC MT(MOD_LCTL, KC_ESC)
-
 /**
  * https://beta.docs.qmk.fm/using-qmk/simple-keycodes/keycodes
  * MUV_DE / MUV_IN are undocumented: https://github.com/qmk/qmk_firmware/issues/4616
@@ -69,11 +69,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   ),
 
   [_RAISE] = LAYOUT_preonic_grid(
-    NO_PIPE_ALT, KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,        KC_8,    KC_9,    KC_0,    NO_AM ,
-    NO_PIPE_ALT, KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,        KC_8,    KC_9,    KC_0,    NO_AM ,
-    _______,     _______, NO_QUOT, _______, _______, _______, _______, NO_BSLS_ALT, NO_LCBR, NO_RCBR, NO_OSLH, NO_AE,
-    _______,     _______, _______, _______, _______, _______, _______, _______,     NO_LESS, NO_GRTR, NO_CIRC, _______,
-    _______,     _______, _______, _______, _______, KC_SPC,  KC_SPC,  _______,     KC_HOME, KC_PGDN, KC_PGUP, KC_END
+    NO_PIPE_ALT, KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,        KC_7,        KC_8,    KC_9,    KC_0,    NO_AM,
+    NO_PIPE_ALT, KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,        KC_7,        KC_8,    KC_9,    KC_0,    NO_AM,
+    _______,     _______, NO_QUOT, _______, _______, _______, POST_UMLAUT, NO_BSLS_ALT, NO_LCBR, NO_RCBR, NO_OSLH, NO_AE,
+    _______,     _______, _______, _______, _______, _______, _______,     _______,     NO_LESS, NO_GRTR, NO_CIRC, _______,
+    _______,     _______, _______, _______, _______, KC_SPC,  KC_SPC,      _______,     KC_HOME, KC_PGDN, KC_PGUP, KC_END
   ),
 
   [_ADJUST] = LAYOUT_preonic_grid(
