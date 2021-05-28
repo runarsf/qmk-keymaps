@@ -76,6 +76,9 @@ usage () { # {{{
 # Argument parsing {{{
 # TODO: Check if zsa firmware should be used for planck_ez https://github.com/zsa/qmk_firmware/
 # TODO: Consider using a default QMK user instead of forcing the user to provide one
+# TODO: Add support for entire make string and not separate arguments
+# TODO: Support only -f and not build
+# TODO: https://github.com/zawaken/sys-help#building-qmk-keymaps-without-sudo-doesnt-work
 QMK_FIRMWARE_FOLDER='qmk_firmware'
 positional=()
 while test "${#}" -gt "0"; do
@@ -94,6 +97,15 @@ while test "${#}" -gt "0"; do
       shift;;
     -f|--flash)
       FLASH="true"
+      shift;;
+    -q|--qmk)
+      #printf "Initializing QMK firmware repo to ${QMK_FIRMWARE_FOLDER}...\n"
+      if test -d "${QMK_FIRMWARE_FOLDER}"; then
+        git submodule init
+        git submodule update --recursive
+      else
+        git clone https://github.com/qmk/qmk_firmware.git "${QMK_FIRMWARE_FOLDER}"
+      fi
       shift;;
     --keyboard)
       TARGET_KEYBOARD="${2}"
@@ -142,6 +154,7 @@ fi
 # Folder for build-files? ./preonic
 TARGET_LAYOUT="${1}"
 
+# Predefined layouts
 if test -z "${KEYBOARD}" \
      -o -z "${MAKE_PREFIX}" \
      -o -z "${MAKE_SUFFIX}" \
