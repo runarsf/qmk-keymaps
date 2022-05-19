@@ -5,7 +5,7 @@ NKRO_ENABLE = yes
 MIDI_ENABLE = yes
 AUDIO_ENABLE = yes
 AUDIO_ENABLE = yes
-TERMINAL_ENABLE = yes
+# TERMINAL_ENABLE = yes
 # Mutually exclusive
 UNICODE_ENABLE = no
 UNICODEMAP_ENABLE = yes

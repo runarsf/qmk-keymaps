@@ -120,13 +120,13 @@ while test "${#}" -gt "0"; do
       IMAGE_EXTENSION="${2}"
       shift;shift;;
     --*)
-      printf "Unknown option: ${1}\n"
+      printf '%s\n' "Unknown option: ${1}"
       exit 1
       shift;;
     -*)
       shopts="${1}"
       if test "${#shopts}" -le "2"; then
-        printf "Unknown option: ${shopts}\n"
+        printf '%s\n' "Unknown option: ${shopts}"
         exit 2
       fi
       shift
@@ -140,16 +140,28 @@ done
 
 set -- "${positional[@]}"
 
-if test -z "${QMK_USER}"; then printf "Required argument -u|--user not provided.\nSee --help for more info.\n" && exit 1; fi
+if test -z "${QMK_USER}"; then printf '%s\n' "Required argument -u|--user not provided.\nSee --help for more info." && exit 1; fi
 
 if test "${#}" -gt "1"; then
-  printf "Too many arguments, expected target layout.\nSee --help for more info.\n"
+  printf '%s\n' "Too many arguments, expected target layout.\nSee --help for more info."
   exit 1
 elif test "${#}" -lt "1"; then
-  printf "Too few arguments, expected target layout.\nSee --help for more info.\n"
+  printf '%s\n' "Too few arguments, expected target layout.\nSee --help for more info."
   exit 1
 fi
 # }}}
+
+confirm () { # {{{
+  local -r msg="${1:-Continue?}"
+  printf '%s\n' "${msg} [Y/n]"
+  read -p "? " -n 1 -r </dev/tty
+  printf '\n'
+  case "${REPLY}" in
+    [Yy]*) return 0; break;;
+    [Nn]*) return 1;;
+    *) printf '%s\n' 'Please answer yes or no...';;
+  esac
+} # }}}
 
 # Folder for build-files? ./preonic
 TARGET_LAYOUT="${1}"
@@ -164,16 +176,16 @@ if test -z "${KEYBOARD}" \
       TARGET_KEYBOARD='preonic'
       MAKE_PREFIX='preonic/rev3'
       IMAGE_EXTENSION='bin'
-      MAKE_SUFFIX=":dfu-util-wait"
+      MAKE_SUFFIX=":dfu-util"
       ;;
     planck)
       TARGET_KEYBOARD='planck'
       MAKE_PREFIX='planck/rev6'
       IMAGE_EXTENSION='bin'
-      MAKE_SUFFIX=':dfu-util-wait'
+      MAKE_SUFFIX=':dfu-util'
       ;;
     *)
-      printf "Undefined layout '${TARGET_LAYOUT}' found, and missing required options.\n"
+      printf '%s\n' "Undefined layout '${TARGET_LAYOUT}' found, and missing required options."
       exit 1
       ;;
   esac
@@ -183,57 +195,61 @@ fi
 BINARY_NAME="${TARGET_LAYOUT}_${QMK_USER}.${IMAGE_EXTENSION}"
 
 if test ! -f "${QMK_FIRMWARE_FOLDER}/Makefile"; then
-  printf "QMK_FIRMWARE_FOLDER (${QMK_FIRMWARE_FOLDER}) does not exist or Makefile is not present, get it from qmk/qmk_firmware on github.\n"
-  exit 1
+  printf '%s\n' "QMK_FIRMWARE_FOLDER (${QMK_FIRMWARE_FOLDER}) does not exist or Makefile is not present, get it from qmk/qmk_firmware on github."
+  if confirm 'Update submodules?'; then
+    git submodule update --init --recursive
+  else
+    exit 1
+  fi
 fi
 
 # Remove build folder
-printf "Deleting preexisting build-files: ${QMK_FIRMWARE_FOLDER}/.build\n"
+printf '%s\n' "Deleting preexisting build-files: ${QMK_FIRMWARE_FOLDER}/.build"
 rm -rf "${QMK_FIRMWARE_FOLDER}/.build"
 
 # qmk_firmware/keyboards/preonic/keymaps/runarsf
-printf "Creating keymap folder: ${QMK_FIRMWARE_FOLDER}/keyboards/${TARGET_KEYBOARD}/keymaps/${QMK_USER}\n"
+printf '%s\n' "Creating keymap folder: ${QMK_FIRMWARE_FOLDER}/keyboards/${TARGET_KEYBOARD}/keymaps/${QMK_USER}"
 mkdir -p "${QMK_FIRMWARE_FOLDER}/keyboards/${TARGET_KEYBOARD}/keymaps/${QMK_USER}"
 
 # preonic/{config.h,keymap.c,rules.mk} qmk_firmware/keyboards/preonic/keymaps/runarsf/
-printf "Copying keymap: ${TARGET_LAYOUT}/{config.h,keymap.c,rules.mk} -> ${QMK_FIRMWARE_FOLDER}/keyboards/${TARGET_KEYBOARD}/keymaps/${QMK_USER}/\n"
+printf '%s\n' "Copying keymap: ${TARGET_LAYOUT}/{config.h,keymap.c,rules.mk} -> ${QMK_FIRMWARE_FOLDER}/keyboards/${TARGET_KEYBOARD}/keymaps/${QMK_USER}/"
 rsync --archive --verbose --human-readable ${TARGET_LAYOUT}/{config.h,keymap.c,rules.mk} ${QMK_FIRMWARE_FOLDER}/keyboards/${TARGET_KEYBOARD}/keymaps/${QMK_USER}/
 
 # Used for shared/common configurations
 #printf "Copying common: ./common -> ./${QMK_FIRMWARE_FOLDER}/users/${QMK_USER}/\n"
 #rsync --archive --verbose --human-readable --delete ./common/ "./${QMK_FIRMWARE_FOLDER}/users/${QMK_USER}/" >/dev/null 2>&1
 
-printf "Initializing submodules\n"
+printf '%s\n' "Initializing submodules"
 make --directory="${QMK_FIRMWARE_FOLDER}" git-submodule >/dev/null 2>&1
 
-printf "Deleting preexisting binary: ${QMK_FIRMWARE_FOLDER}/${TARGET_LAYOUT}_${QMK_USER}.${IMAGE_EXTENSION}\n"
+printf '%s\n' "Deleting preexisting binary: ${QMK_FIRMWARE_FOLDER}/${TARGET_LAYOUT}_${QMK_USER}.${IMAGE_EXTENSION}"
 rm -rf "${QMK_FIRMWARE_FOLDER}/${TARGET_LAYOUT}_${QMK_USER}.${IMAGE_EXTENSION}"
 
 cd "${QMK_FIRMWARE_FOLDER}"
 
 if test -z "${PODMAN}"; then
   if test -n "${FLASH}"; then
-    printf "Building and flashing (docker) ${MAKE_PREFIX}:${QMK_USER}\n"
+    printf '%s\n' "Building and flashing (docker) ${MAKE_PREFIX}:${QMK_USER}"
     ./util/docker_build.sh "${MAKE_PREFIX}:${QMK_USER}${MAKE_SUFFIX}"
   else
-    printf "Building (docker) ${MAKE_PREFIX}:${QMK_USER}\n"
+    printf '%s\n' "Building (docker) ${MAKE_PREFIX}:${QMK_USER}"
     ./util/docker_build.sh "${MAKE_PREFIX}:${QMK_USER}"
   fi
 else
-  printf "Copying podman_build.sh: ${__dir}/podman_build.sh -> ./util/"
+  printf '%s\n' "Copying podman_build.sh: ${__dir}/podman_build.sh -> ./util/"
   rsync --archive --verbose --human-readable --delete "${__dir}/podman_build.sh" ./util/
   if test -n "${FLASH}"; then
-    printf "Building and flashing (podman) ${MAKE_PREFIX}:${QMK_USER}\n"
+    printf '%s\n' "Building and flashing (podman) ${MAKE_PREFIX}:${QMK_USER}"
     ./util/podman_build.sh "${MAKE_PREFIX}:${QMK_USER}${MAKE_SUFFIX}"
   else
-    printf "Building (podman) ${MAKE_PREFIX}:${QMK_USER}\n"
+    printf '%s\n' "Building (podman) ${MAKE_PREFIX}:${QMK_USER}"
     ./util/podman_build.sh "${MAKE_PREFIX}:${QMK_USER}"
   fi
 fi
 
 makeExit="${?}"
 if test "${makeExit}" -ne "0"; then
-  printf "Something went wrong, Make exited with code ${makeExit}.\n"
+  printf '%s\n' "Something went wrong, Make exited with code ${makeExit}."
 else
-  printf "Make finished, you can find the binaries in ${QMK_FIRMWARE_FOLDER}/.build\n"
+  printf '%s\n' "Make finished, you can find the binaries in ${QMK_FIRMWARE_FOLDER}/.build"
 fi
