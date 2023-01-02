@@ -118,6 +118,7 @@ case "${BUILDER}" in
   local)
     make "${MAKE_COMMAND}"
     if test -n "${BOOTLOADER}"; then
+      # TODO python3 -m pip install -r /qmk_firmware/requirements.txt
       qmk flash "${KEYMAP_BIN}" --bootloader "${BOOTLOADER}"
     fi;;
 esac
