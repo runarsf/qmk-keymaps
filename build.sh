@@ -8,7 +8,7 @@ known_keymaps() { # keymap -> KEYBOARD, KEYMAP, BOOTLOADER, MAKE_COMMAND
   case "${KEYMAP}" in
     mylayout)
       _KEYBOARD=preonic/rev3
-      _BOOTLOADER=dfu-util;;
+      _TARGET=dfu-util;;
     *)
       if test ! -d "${KEYMAPS_DIR}/${KEYMAP}" -o -z "${KEYBOARD}"; then
         printf '%s\n' "Error: Unknown or not properly formatted keymap: ${KEYMAP}"
@@ -16,14 +16,14 @@ known_keymaps() { # keymap -> KEYBOARD, KEYMAP, BOOTLOADER, MAKE_COMMAND
       fi;;
   esac
   : "${KEYBOARD:=${_KEYBOARD}}"
-  : "${BOOTLOADER:=${FLASH:+${_BOOTLOADER}}}"
+  : "${TARGET:=${FLASH:+${_TARGET}}}"
 }
 
-parse_make_command() { # make_command -> KEYBOARD, KEYMAP, BOOTLOADER, MAKE_COMMAND
+parse_make_command() { # make_command -> KEYBOARD, KEYMAP, TARGET, MAKE_COMMAND
   MAKE_COMMAND="${1}"
   KEYBOARD="$(printf '%s' "${1}" | awk '{split($0,a,":"); print a[1]}')"
   KEYMAP="$(printf '%s' "${1}" | awk '{split($0,a,":"); print a[2]}')"
-  : "${BOOTLOADER:=$(printf '%s' "${1}" | awk '{split($0,a,":"); print a[3]}')}"
+  : "${TARGET:=$(printf '%s' "${1}" | awk '{split($0,a,":"); print a[3]}')}"
 }
 
 arrstash () {
@@ -33,16 +33,16 @@ arrstash () {
   printf ' \n'
 }
 
-BUILDER="docker" POSITIONALS="" FLASH="" BOOTLOADER="" KEYBOARD="" KEYMAP=""
+RUNTIME="docker" POSITIONALS="" FLASH="" TARGET="" KEYBOARD="" KEYMAP=""
 while test "${#}" -gt "0"; do
   case "$(printf '%s' "${1}" | tr '[:upper:]' '[:lower:]')" in
     # -h|--help)
-    -l|--local) BUILDER="local";;
-    -d|--docker) BUILDER="docker";;
-    -p|--podman) BUILDER="podman";;
+    -l|--local) RUNTIME="local";;
+    -d|--docker) RUNTIME="docker";;
+    -p|--podman) RUNTIME="podman";;
     -f|--flash) FLASH="true";;
-    -b|--bootloader)
-      BOOTLOADER="${2}"
+    -t|--target)
+      TARGET="${2}"
       shift;;
     -k|--keyboard)
       KEYBOARD="${2}"
@@ -85,7 +85,7 @@ else
 fi
 
 FIRMWARE_DIR="./qmk_firmware"
-MAKE_COMMAND="${KEYBOARD}:${KEYMAP}${BOOTLOADER:+:${BOOTLOADER}}"
+MAKE_COMMAND="${KEYBOARD}:${KEYMAP}${TARGET:+:${TARGET}}"
 KEYMAP_BIN="$(printf '%s' "${KEYBOARD}_${KEYMAP}" | sed -e 's/[^A-Za-z0-9._-]/_/g').bin"
 KEYMAPS_DIR="./keymaps"
 FIRMWARE_KEYMAPS_DIR="${FIRMWARE_DIR}/keyboards/${KEYBOARD}/keymaps"
@@ -97,13 +97,14 @@ printf '%-21s| %s\n' \
   "KEYMAP_BIN" "${KEYMAP_BIN}" \
   "KEYMAPS_DIR" "${KEYMAPS_DIR}" \
   "FIRMWARE_KEYMAPS_DIR" "${FIRMWARE_KEYMAPS_DIR}" \
-  "BUILDER" "${BUILDER}" \
+  "RUNTIME" "${RUNTIME}" \
   "FLASH" "${FLASH}" \
-  "BOOTLOADER" "${BOOTLOADER}" \
+  "TARGET" "${TARGET}" \
   "MAKE_COMMAND" "${MAKE_COMMAND}"
 
-git submodule update --init --recursive "${FIRMWARE_DIR}"
-make --directory="${FIRMWARE_DIR}" git-submodule >/dev/null 2>&1
+# git submodule update --init --recursive --remote "${FIRMWARE_DIR}"
+git submodule update --remote "${FIRMWARE_DIR}"
+make --directory="${FIRMWARE_DIR}" git-submodule
 rm -rf "${FIRMWARE_DIR}/.build"
 mkdir -p "${FIRMWARE_KEYMAPS_DIR}"
 rm -rf "${FIRMWARE_KEYMAPS_DIR}/${KEYMAP}"
@@ -112,14 +113,13 @@ rm -f "${FIRMWARE_DIR}/${KEYMAP_BIN}"
 
 cd "${FIRMWARE_DIR}"
 
-case "${BUILDER}" in
-  docker) ./util/docker_build.sh "${MAKE_COMMAND}";;
-  podman) ./util/podman_build.sh "${MAKE_COMMAND}";;
+case "${RUNTIME}" in
+  docker|podman) RUNTIME="${RUNTIME}" ./util/docker_build.sh "${MAKE_COMMAND}";;
   local)
     make "${MAKE_COMMAND}"
-    if test -n "${BOOTLOADER}"; then
+    if test -n "${TARGET}"; then
       # TODO python3 -m pip install -r /qmk_firmware/requirements.txt
-      qmk flash "${KEYMAP_BIN}" --bootloader "${BOOTLOADER}"
+      qmk flash "${KEYMAP_BIN}" --bootloader "${TARGET}"
     fi;;
 esac
 
