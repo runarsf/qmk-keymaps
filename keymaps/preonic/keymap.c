@@ -1,5 +1,6 @@
 #include QMK_KEYBOARD_H
 #include "keymap_norwegian.h"
+#include <stdlib.h>
 
 #ifdef AUDIO_ENABLE
   #include "muse.h"
@@ -16,6 +17,7 @@ enum preonic_layers {
 
 enum preonic_keycodes {
   QWERTY = SAFE_RANGE,
+  SARCASM,
   LOWER,
   RAISE,
   BACKLIT,
@@ -72,7 +74,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
    * │     │     │     │     │     │     │     │  \  │  {  │  }  │  Ø  │  Æ  │
    * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-   * │     │     │     │     │     │     │     │     │  <  │  >  │  ^  │     │
+   * │     │     │     │     │     │     │     │  ¨  │  <  │  >  │  ^  │     │
    * ├─────┼─────┼─────┼─────┼─────┼─────┴─────┼─────┼─────┼─────┼─────┼─────┤
    * │     │     │     │ AGr │ CMB │           │ [_] │ Hom │ PgD │ PgU │ End │
    * └─────┴─────┴─────┴─────┴─────┴───────────┴─────┴─────┴─────┴─────┴─────┘
@@ -81,7 +83,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     NO_PIPE, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
     _______, NO_1,    NO_2,    NO_3,    NO_4,    NO_5,    NO_6,    NO_7,    NO_8,    NO_9,    NO_0,    NO_ARNG,
     _______, _______, _______, _______, _______, _______, _______, NO_BSLS, NO_LCBR, NO_RCBR, NO_OSTR, NO_AE,
-    _______, _______, _______, _______, _______, _______, _______, _______, NO_LABK, NO_RABK, NO_CIRC, _______,
+    _______, _______, _______, _______, _______, _______, _______, NO_DIAE, NO_LABK, NO_RABK, NO_CIRC, _______,
     _______, _______, _______, KC_ALGR, _______, _______, _______, _______, KC_HOME, KC_PGDN, KC_PGUP, KC_END
   ),
 
@@ -91,7 +93,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
    * │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │
    * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-   * │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │
+   * │ Cps │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │
    * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
    * │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │
    * ├─────┼─────┼─────┼─────┼─────┼─────┴─────┼─────┼─────┼─────┼─────┼─────┤
@@ -101,28 +103,28 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [CMB] = LAYOUT_preonic_grid(
     KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,
     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+    KC_CAPS, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______, KC_MPLY, KC_MPLY, _______, KC_MPRV, KC_VOLD, KC_VOLU, KC_MNXT
   ),
 
   /** QMK
    * ┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┐
-   * │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ RST │
+   * │ --- │ QTY │ SRC │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ RST │
    * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-   * │ --- │ Ms1 │ MsU │ Ms2 │ MWU │ N07 │ N08 │ N09 │ --- │ BlU │ --- │ --- │
+   * │ --- │ Ms1 │ MsU │ Ms2 │ MWU │ N07 │ N08 │ N09 │ --- │ --- │ --- │ --- │
    * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-   * │ Cps │ MsL │ MsD │ MsR │ MWD │ N04 │ N05 │ N06 │ --- │ BlD │ --- │ --- │
+   * │ --- │ MsL │ MsD │ MsR │ MWD │ N04 │ N05 │ N06 │ --- │ --- │ --- │ --- │
    * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-   * │ --- │ --- │ --- │ MWL │ MWR │ N01 │ N02 │ N03 │ --- │ BlT │ --- │ --- │
+   * │ --- │ --- │ --- │ MWL │ MWR │ N01 │ N02 │ N03 │ --- │ --- │ --- │ --- │
    * ├─────┼─────┼─────┼─────┼─────┼─────┴─────┼─────┼─────┼─────┼─────┼─────┤
    * │ --- │ [_] │ --- │ Ms2 │ Ms1 │  NumPad0  │ NLk │ --- │ --- │ --- │ --- │
    * └─────┴─────┴─────┴─────┴─────┴───────────┴─────┴─────┴─────┴─────┴─────┘
    */
   [QMK] = LAYOUT_preonic_grid(
-    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, MO(RST),
+    _______, DF(QTY), SARCASM, _______, _______, _______, _______, _______, _______, _______, _______, MO(RST),
     _______, KC_BTN2, KC_MS_U, KC_BTN1, KC_WH_U, KC_KP_7, KC_KP_8, KC_KP_9, _______, _______, _______, _______,
-    KC_CAPS, KC_MS_L, KC_MS_D, KC_MS_R, KC_WH_D, KC_KP_4, KC_KP_5, KC_KP_6, _______, _______, _______, _______,
+    _______, KC_MS_L, KC_MS_D, KC_MS_R, KC_WH_D, KC_KP_4, KC_KP_5, KC_KP_6, _______, _______, _______, _______,
     _______, _______, _______, KC_WH_L, KC_WH_R, KC_KP_1, KC_KP_2, KC_KP_3, _______, _______, _______, _______,
     _______, _______, _______, KC_BTN2, KC_BTN1, KC_KP_0, KC_KP_0, KC_NUM,  _______, _______, _______, _______
   ),
@@ -149,7 +151,65 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   )
 };
 
+const uint8_t PROGMEM ledmap[][RGB_MATRIX_LED_COUNT][3] = {
+  [LWR] = {
+    {255,0,0}, {0,0,0},   {0,0,0},   {0,0,0},   {0,0,0},   {255,0,0}, {255,0,0}, {255,0,0}, {255,0,0},
+  },
+  [RSE] = {
+    {255,0,0}, {255,0,0}, {255,0,0}, {255,0,0}, {255,0,0}, {0,0,0},   {0,0,0},   {0,0,0},   {0,0,0},
+  },
+  [CMB] = {
+    {255,0,0}, {255,0,0}, {255,0,0}, {255,0,0}, {255,0,0}, {255,0,0}, {255,0,0}, {255,0,0}, {255,0,0},
+  },
+  [QMK] = {
+    {0,0,255}, {0,0,255}, {0,0,255}, {0,0,255}, {0,0,255}, {0,0,255}, {0,0,255}, {0,0,255}, {0,0,255},
+  },
+  [RST] = {
+    {0,0,0},   {255,0,0}, {0,0,0},   {0,0,0},   {0,0,0},   {0,0,0},   {0,0,0},   {0,0,0},   {255,0,0},
+  },
+};
+
+// https://github.com/imatpot/qmk-keymaps
+void set_layer_color(uint8_t layer) {
+  for (uint8_t i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
+    uint8_t color[3];
+    memcpy(color, ledmap[layer][i], 3);
+
+    rgb_matrix_set_color(i, color[0], color[1], color[2]);
+  }
+}
+
+bool rgb_matrix_indicators_user(void) {
+  uint8_t layer = biton32(layer_state);
+
+  if (layer != QTY) {
+    set_layer_color(layer);
+  } else if (host_keyboard_led_state().caps_lock) {
+    rgb_matrix_set_color_all(0, 0, 0);
+    rgb_matrix_set_color(1, 255, 255, 255);
+    rgb_matrix_set_color(8, 255, 255, 255);
+  }
+
+  return true;
+}
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  static bool sarcastic = false;
+  static bool capitalized = false;
+  static int same = 0;
+
+  // TODO Only toggle if `keycode` is alphanumeric
+  if(sarcastic && record->event.pressed) {
+    if (rand() % 2 == 1 || same >= 1) {
+      register_code(KC_CAPS);
+      unregister_code(KC_CAPS);
+      capitalized = !capitalized;
+      same = 0;
+    } else {
+      same++;
+    }
+  }
+
   switch (keycode) {
     case QWERTY:
       if (record->event.pressed) {
@@ -174,6 +234,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       } else {
         layer_off(RSE);
         update_tri_layer(LWR, RSE, CMB);
+      }
+      return false;
+      break;
+    case SARCASM:
+      if(record->event.pressed) {
+        sarcastic = !sarcastic;
+        if(capitalized) {
+          register_code(KC_CAPS);
+          unregister_code(KC_CAPS);
+        }
       }
       return false;
       break;

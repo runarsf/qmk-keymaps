@@ -33,7 +33,7 @@ firmware_lock() { # {{{
       git checkout master
       git --git-dir "${FIRMWARE_DIR}/.git" pull
     fi
-    git rev-parse --short HEAD > "${KEYMAPS_DIR}/${KEYMAP}/firmware.lock"
+    git rev-parse HEAD > "${KEYMAPS_DIR}/${KEYMAP}/firmware.lock"
   fi
   cd "${__DIR}"
 } # }}}
