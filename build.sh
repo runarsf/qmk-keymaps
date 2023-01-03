@@ -23,8 +23,8 @@ prompt () { # {{{
 firmware_lock() { # {{{
   cd "${FIRMWARE_DIR}"
   git config advice.detachedHead false
-  if test -f "${__DIR}/keymaps/mylayout/firmware.lock"; then
-    FIRMWARE_LOCK_HASH="$(cat "${__DIR}/keymaps/mylayout/firmware.lock" | head -1)"
+  if test -f "${KEYMAPS_DIR}/${KEYMAP}/firmware.lock"; then
+    FIRMWARE_LOCK_HASH="$(cat "${KEYMAPS_DIR}/${KEYMAP}/firmware.lock" | head -1)"
     git checkout "${FIRMWARE_LOCK_HASH}"
   else
     if test ! -d "${FIRMWARE_DIR}"; then
@@ -33,7 +33,7 @@ firmware_lock() { # {{{
       git checkout master
       git --git-dir "${FIRMWARE_DIR}/.git" pull
     fi
-    git rev-parse --short HEAD > "${__DIR}/keymaps/mylayout/firmware.lock"
+    git rev-parse --short HEAD > "${KEYMAPS_DIR}/${KEYMAP}/firmware.lock"
   fi
   cd "${__DIR}"
 } # }}}
