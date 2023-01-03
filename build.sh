@@ -3,6 +3,8 @@
 set -o errexit
 set -o nounset
 
+# TODO image extension (hex/bin)
+
 __DIR="$( cd -- "$(dirname "${0}")" >/dev/null 2>&1 ; pwd -P )"
 FIRMWARE_DIR="$(realpath "${__DIR}/qmk_firmware")"
 KEYMAPS_DIR="$(realpath "${__DIR}/keymaps")"
@@ -39,7 +41,7 @@ firmware_lock() { # {{{
 known_keymaps() { # keymap -> KEYBOARD, KEYMAP, BOOTLOADER, MAKE_COMMAND {{{
   KEYMAP="${1}"
   case "${KEYMAP}" in
-    mylayout)
+    preonic)
       _KEYBOARD=preonic/rev3_drop
       _TARGET=dfu-util;;
     *)
