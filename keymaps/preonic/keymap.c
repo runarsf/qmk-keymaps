@@ -5,8 +5,6 @@
   #include "muse.h"
 #endif
 
-#define CTL_ESC MT(MOD_LCTL, KC_ESC)
-
 enum preonic_layers {
   QTY,
   LWR,
@@ -30,7 +28,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
    * │ Tab │  Q  │  W  │  E  │  R  │  T  │  Y  │  U  │  I  │  O  │  P  │ Del │
    * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-   * │ CtE │  A  │  S  │  D  │  F  │  G  │  H  │  J  │  K  │  L  │  '  │  "  │
+   * │ Tab │  A  │  S  │  D  │  F  │  G  │  H  │  J  │  K  │  L  │  '  │  "  │
    * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
    * │ Sft │  Z  │  X  │  C  │  V  │  B  │  N  │  M  │ , ; │ . : │ - _ │ Ret │
    * ├─────┼─────┼─────┼─────┼─────┼─────┴─────┼─────┼─────┼─────┼─────┼─────┤
@@ -40,7 +38,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [QTY] = LAYOUT_preonic_grid(
     KC_ESC,  NO_1,    NO_2,    NO_3,    NO_4,    NO_5,    NO_6,    NO_7,    NO_8,    NO_9,    NO_0,    KC_BSPC,
     KC_TAB,  NO_Q,    NO_W,    NO_E,    NO_R,    NO_T,    NO_Y,    NO_U,    NO_I,    NO_O,    NO_P,    KC_DEL,
-    CTL_ESC, NO_A,    NO_S,    NO_D,    NO_F,    NO_G,    NO_H,    NO_J,    NO_K,    NO_L,    NO_QUOT, NO_DQUO,
+    KC_TAB,  NO_A,    NO_S,    NO_D,    NO_F,    NO_G,    NO_H,    NO_J,    NO_K,    NO_L,    NO_QUOT, NO_DQUO,
     KC_LSFT, NO_Z,    NO_X,    NO_C,    NO_V,    NO_B,    NO_N,    NO_M,    NO_COMM, NO_DOT,  NO_MINS, KC_ENT,
     KC_LCTL, TT(QMK), KC_LGUI, KC_LALT, LOWER,   KC_SPC,  KC_SPC,  RAISE,   KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT
   ),
@@ -102,21 +100,21 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    */
   [CMB] = LAYOUT_preonic_grid(
     KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,
-    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-    _______, _______, _______, _______, _______, KC_MPLY, KC_MPLY, _______, KC_MPRV, KC_VOLD, KC_VOLU, KC_MNXT
+    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______, KC_MPLY, KC_MPLY, _______, KC_MPRV, KC_VOLD, KC_VOLU, KC_MNXT
   ),
 
   /** QMK
    * ┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┐
    * │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ RST │
    * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-   * │ --- │ Ms1 │ MsU │ Ms2 │ MWU │ N07 │ N08 │ N09 │ --- │ --- │ --- │ --- │
+   * │ --- │ Ms1 │ MsU │ Ms2 │ MWU │ N07 │ N08 │ N09 │ --- │ BlU │ --- │ --- │
    * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-   * │ Cps │ MsL │ MsD │ MsR │ MWD │ N04 │ N05 │ N06 │ --- │ --- │ --- │ --- │
+   * │ Cps │ MsL │ MsD │ MsR │ MWD │ N04 │ N05 │ N06 │ --- │ BlD │ --- │ --- │
    * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-   * │ --- │ --- │ --- │ MWL │ MWR │ N01 │ N02 │ N03 │ --- │ --- │ --- │ --- │
+   * │ --- │ --- │ --- │ MWL │ MWR │ N01 │ N02 │ N03 │ --- │ BlT │ --- │ --- │
    * ├─────┼─────┼─────┼─────┼─────┼─────┴─────┼─────┼─────┼─────┼─────┼─────┤
    * │ --- │ [_] │ --- │ Ms2 │ Ms1 │  NumPad0  │ NLk │ --- │ --- │ --- │ --- │
    * └─────┴─────┴─────┴─────┴─────┴───────────┴─────┴─────┴─────┴─────┴─────┘
@@ -139,7 +137,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
    * │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │
    * ├─────┼─────┼─────┼─────┼─────┼─────┴─────┼─────┼─────┼─────┼─────┼─────┤
-   * │ --- │ [_] │ --- │ --- │ --- │   Reset   │ --- │ --- │ --- │ --- │ --- │
+   * │ --- │ --- │ --- │ --- │ --- │   Reset   │ --- │ --- │ --- │ --- │ --- │
    * └─────┴─────┴─────┴─────┴─────┴───────────┴─────┴─────┴─────┴─────┴─────┘
    */
   [RST] = LAYOUT_preonic_grid(
@@ -256,24 +254,24 @@ bool dip_switch_update_user(uint8_t index, bool active) {
 }
 
 void matrix_scan_user(void) {
-#ifdef AUDIO_ENABLE
-  if (muse_mode) {
-    if (muse_counter == 0) {
-      uint8_t muse_note = muse_offset + SCALE[muse_clock_pulse()];
-      if (muse_note != last_muse_note) {
-        stop_note(compute_freq_for_midi_note(last_muse_note));
-        play_note(compute_freq_for_midi_note(muse_note), 0xF);
-        last_muse_note = muse_note;
+  #ifdef AUDIO_ENABLE
+    if (muse_mode) {
+      if (muse_counter == 0) {
+        uint8_t muse_note = muse_offset + SCALE[muse_clock_pulse()];
+        if (muse_note != last_muse_note) {
+          stop_note(compute_freq_for_midi_note(last_muse_note));
+          play_note(compute_freq_for_midi_note(muse_note), 0xF);
+          last_muse_note = muse_note;
+        }
       }
+      muse_counter = (muse_counter + 1) % muse_tempo;
+      } else {
+        if (muse_counter) {
+          stop_all_notes();
+          muse_counter = 0;
+        }
     }
-    muse_counter = (muse_counter + 1) % muse_tempo;
-    } else {
-      if (muse_counter) {
-        stop_all_notes();
-        muse_counter = 0;
-      }
-  }
-#endif
+  #endif
 }
 
 bool music_mask_user(uint16_t keycode) {
