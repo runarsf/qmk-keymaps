@@ -9,6 +9,25 @@ __DIR="$( cd -- "$(dirname "${0}")" >/dev/null 2>&1 ; pwd -P )"
 FIRMWARE_DIR="$(realpath "${__DIR}/qmk_firmware")"
 KEYMAPS_DIR="$(realpath "${__DIR}/keymaps")"
 
+known_keymaps() { # keymap -> KEYBOARD, KEYMAP, BOOTLOADER, MAKE_COMMAND {{{
+  KEYMAP="${1}"
+  case "${KEYMAP}" in
+    preonic)
+      _KEYBOARD=preonic/rev3_drop
+      _TARGET=dfu-util;;
+    planck)
+      _KEYBOARD=planck/ez/glow
+      _TARGET=dfu-util;;
+    *)
+      if test ! -d "${KEYMAPS_DIR}/${KEYMAP}" -o -z "${KEYBOARD}"; then
+        printf '%s\n' "Error: Unknown or not properly formatted keymap: ${KEYMAP}"
+        exit 1
+      fi;;
+  esac
+  : "${KEYBOARD:=${_KEYBOARD}}"
+  : "${TARGET:=${FLASH:+${_TARGET}}}"
+} # }}}
+
 prompt () { # {{{
   _msg="${1:-Continue?}"
   printf '%s' "${_msg} [Y/n] " >&2
@@ -21,15 +40,16 @@ prompt () { # {{{
 } # }}}
 
 firmware_lock() { # {{{
+  if test ! -d "${FIRMWARE_DIR}"; then
+    git clone "https://github.com/qmk/qmk_firmware" "${FIRMWARE_DIR}"
+  fi
   cd "${FIRMWARE_DIR}"
   git config advice.detachedHead false
   if test -f "${KEYMAPS_DIR}/${KEYMAP}/firmware.lock"; then
     FIRMWARE_LOCK_HASH="$(cat "${KEYMAPS_DIR}/${KEYMAP}/firmware.lock" | head -1)"
     git checkout "${FIRMWARE_LOCK_HASH}"
   else
-    if test ! -d "${FIRMWARE_DIR}"; then
-      git clone "https://github.com/qmk/qmk_firmware" "${FIRMWARE_DIR}"
-    elif prompt "No firmware lockfile found, update QMK firmware to the latest version?"; then
+    if prompt "No firmware lockfile found, update QMK firmware to the latest version?"; then
       git checkout master
       git --git-dir "${FIRMWARE_DIR}/.git" pull
     fi
@@ -37,22 +57,6 @@ firmware_lock() { # {{{
   fi
   cd "${__DIR}"
 } # }}}
-
-known_keymaps() { # keymap -> KEYBOARD, KEYMAP, BOOTLOADER, MAKE_COMMAND {{{
-  KEYMAP="${1}"
-  case "${KEYMAP}" in
-    preonic)
-      _KEYBOARD=preonic/rev3_drop
-      _TARGET=dfu-util;;
-    *)
-      if test ! -d "${KEYMAPS_DIR}/${KEYMAP}" -o -z "${KEYBOARD}"; then
-        printf '%s\n' "Error: Unknown or not properly formatted keymap: ${KEYMAP}"
-        exit 1
-      fi;;
-  esac
-  : "${KEYBOARD:=${_KEYBOARD}}"
-  : "${TARGET:=${FLASH:+${_TARGET}}}"
-} # }}}
 
 parse_make_command() { # make_command -> KEYBOARD, KEYMAP, TARGET, MAKE_COMMAND {{{
   MAKE_COMMAND="${1}"
@@ -69,7 +73,7 @@ arrstash () { # {{{
 } # }}}
 
 # Argument parsing {{{
-RUNTIME="docker" POSITIONALS="" FLASH="" TARGET="" KEYBOARD="" KEYMAP=""
+RUNTIME="docker" BIN_EXTENSION="bin" POSITIONALS="" FLASH="" TARGET="" KEYBOARD="" KEYMAP=""
 while test "${#}" -gt "0"; do
   case "$(printf '%s' "${1}" | tr '[:upper:]' '[:lower:]')" in
     # -h|--help)
@@ -82,6 +86,12 @@ while test "${#}" -gt "0"; do
       shift;;
     -k|--keyboard)
       KEYBOARD="${2}"
+      shift;;
+    -e|--extension)
+      BIN_EXTENSION="${2}"
+      shift;;
+    -u|--user)
+      USER="${2}"
       shift;;
     --*)
       printf '%s\n' "Unknown option: ${1}"
@@ -120,8 +130,9 @@ else
   known_keymaps "${1}"
 fi
 MAKE_COMMAND="${KEYBOARD}:${KEYMAP}${TARGET:+:${TARGET}}"
-KEYMAP_BIN="$(printf '%s' "${KEYBOARD}_${KEYMAP}" | sed -e 's/[^A-Za-z0-9._-]/_/g').bin"
-FIRMWARE_KEYMAPS_DIR="$(realpath "${FIRMWARE_DIR}/keyboards/${KEYBOARD}/keymaps")"
+KEYMAP_BIN="$(printf '%s' "${KEYBOARD}_${KEYMAP}" | sed -e 's/[^A-Za-z0-9._-]/_/g').${BIN_EXTENSION}"
+FIRMWARE_KEYMAPS_DIR="$(readlink -m "${FIRMWARE_DIR}/keyboards/${KEYBOARD}/keymaps")"
+FIRMWARE_USER_DIR="$(readlink -m "${FIRMWARE_DIR}/users/${KEYMAP}")"
 # }}}
 
 printf '%-21s| %s\n' \
@@ -130,6 +141,7 @@ printf '%-21s| %s\n' \
   "KEYMAP_BIN" "${KEYMAP_BIN}" \
   "KEYMAPS_DIR" "${KEYMAPS_DIR}" \
   "FIRMWARE_KEYMAPS_DIR" "${FIRMWARE_KEYMAPS_DIR}" \
+  "FIRMWARE_USER_DIR" "${FIRMWARE_USER_DIR}" \
   "RUNTIME" "${RUNTIME}" \
   "FLASH" "${FLASH}" \
   "TARGET" "${TARGET}" \
@@ -137,11 +149,14 @@ printf '%-21s| %s\n' \
 
 main() { # {{{
   make --directory="${FIRMWARE_DIR}" git-submodule
-  rm -rf "${FIRMWARE_DIR}/.build"
+  rm -rf "${FIRMWARE_DIR}/.build" \
+         "${FIRMWARE_DIR}/${KEYMAP_BIN}" \
+         "${FIRMWARE_USER_DIR}" \
+         "${FIRMWARE_KEYMAPS_DIR}/${KEYMAP}"
+
   mkdir -p "${FIRMWARE_KEYMAPS_DIR}"
-  rm -rf "${FIRMWARE_KEYMAPS_DIR}/${KEYMAP}"
   cp -r "${KEYMAPS_DIR}/${KEYMAP}" "${FIRMWARE_KEYMAPS_DIR}"
-  rm -f "${FIRMWARE_DIR}/${KEYMAP_BIN}"
+  cp -r "$(readlink -m "${__DIR}/common")" "${FIRMWARE_USER_DIR}"
 
   cd "${FIRMWARE_DIR}"
 
