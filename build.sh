@@ -34,7 +34,7 @@ prompt () { # {{{
   printf '%s' "${_msg} [Y/n] " >&2
   read -r REPLY </dev/tty
   case "${REPLY}" in
-    [Yy]*|"") return 0; break;;
+    [Yy]*|"") return 0;;
     [Nn]*) return 1;;
     *) prompt 'Please answer yes or no...';;
   esac
@@ -156,9 +156,7 @@ printf '%-23s | %s\n' \
   "TARGET" "${TARGET}" \
   "MAKE_COMMAND" "${MAKE_COMMAND}"
 
-if ! prompt "Looking good?"; then
-  exit 1
-fi
+prompt "Looking good?"
 
 main() { # {{{
   make --directory="${FIRMWARE_DIR}" git-submodule
