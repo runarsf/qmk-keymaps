@@ -130,11 +130,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   )
 };
 
-const RGB ___ = {0,   0,   0};
-const RGB BLU = {0,   138, 255};
-const RGB LBL = {162, 213, 252};
-const RGB RED = {248, 33,  33};
-const RGB LRD = {242, 153, 168};
+// TODO set RGB brightness
+const RGB ___ = {.r=0,   .g=0,   .b=0};
+const RGB BLU = {.r=0,   .g=138, .b=255};
+const RGB LBL = {.r=162, .g=213, .b=252};
+const RGB RED = {.r=248, .g=33,  .b=33};
+const RGB LRD = {.r=242, .g=153, .b=168};
 
 const RGB PROGMEM ledmap[][RGB_MATRIX_LED_COUNT] = {
   [LWR] = {
@@ -206,14 +207,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 void set_layer_color(uint8_t layer) {
   for (uint8_t i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
-    uint8_t r = ledmap[layer][i].r;
-    uint8_t g = ledmap[layer][i].g;
-    uint8_t b = ledmap[layer][i].b;
-    rgb_matrix_set_color(i, r, g, b);
+    RGB color = ledmap[layer][i];
+    rgb_matrix_set_color(i, color.r, color.g, color.b);
   }
 }
 
 bool rgb_matrix_indicators_user(void) {
+  // TODO clear leds on QTY when returning
   uint8_t layer = biton32(layer_state);
 
   if (layer != QTY) {
