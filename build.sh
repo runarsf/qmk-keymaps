@@ -3,6 +3,7 @@
 set -o errexit
 set -o nounset
 
+# TODO migrate to userspace (QMK_USER) instead of KEYMAP
 # TODO image extension (hex/bin)
 
 __DIR="$( cd -- "$(dirname "${0}")" >/dev/null 2>&1 ; pwd -P )"
@@ -73,7 +74,7 @@ arrstash () { # {{{
 } # }}}
 
 # Argument parsing {{{
-RUNTIME="docker" BIN_EXTENSION="bin" POSITIONALS="" FLASH="" TARGET="" KEYBOARD="" KEYMAP=""
+RUNTIME="docker" QMK_USER="${USER}" BIN_EXTENSION="bin" POSITIONALS="" FLASH="" TARGET="" KEYBOARD="" KEYMAP=""
 while test "${#}" -gt "0"; do
   case "$(printf '%s' "${1}" | tr '[:upper:]' '[:lower:]')" in
     # -h|--help)
@@ -91,7 +92,7 @@ while test "${#}" -gt "0"; do
       BIN_EXTENSION="${2}"
       shift;;
     -u|--user)
-      USER="${2}"
+      QMK_USER="${2}"
       shift;;
     --*)
       printf '%s\n' "Unknown option: ${1}"
@@ -129,44 +130,57 @@ if test "${1#*:}" != "${1}"; then
 else
   known_keymaps "${1}"
 fi
-MAKE_COMMAND="${KEYBOARD}:${KEYMAP}${TARGET:+:${TARGET}}"
-KEYMAP_BIN="$(printf '%s' "${KEYBOARD}_${KEYMAP}" | sed -e 's/[^A-Za-z0-9._-]/_/g').${BIN_EXTENSION}"
+MAKE_COMMAND="${KEYBOARD}:${QMK_USER}${TARGET:+:${TARGET}}"
+KEYMAP_DIR="${KEYMAPS_DIR}/${KEYMAP}"
+KEYMAP_BIN="$(printf '%s' "${KEYBOARD}_${QMK_USER}" | sed -e 's/[^A-Za-z0-9._-]/_/g').${BIN_EXTENSION}"
+USERSPACE_DIR=$(readlink -m "${__DIR}/common")
 FIRMWARE_KEYMAPS_DIR="$(readlink -m "${FIRMWARE_DIR}/keyboards/${KEYBOARD}/keymaps")"
-FIRMWARE_USER_DIR="$(readlink -m "${FIRMWARE_DIR}/users/${KEYMAP}")"
+FIRMWARE_KEYMAP_DIR="${FIRMWARE_KEYMAPS_DIR}/${QMK_USER}"
+FIRMWARE_USERSPACES_DIR="$(readlink -m "${FIRMWARE_DIR}/users")"
+FIRMWARE_USERSPACE_DIR="${FIRMWARE_USERSPACES_DIR}/${QMK_USER}"
 # }}}
 
-printf '%-21s| %s\n' \
+printf '%-23s | %s\n' \
   "KEYBOARD" "${KEYBOARD}" \
   "KEYMAP" "${KEYMAP}" \
   "KEYMAP_BIN" "${KEYMAP_BIN}" \
   "KEYMAPS_DIR" "${KEYMAPS_DIR}" \
+  "KEYMAP_DIR" "${KEYMAP_DIR}" \
   "FIRMWARE_KEYMAPS_DIR" "${FIRMWARE_KEYMAPS_DIR}" \
-  "FIRMWARE_USER_DIR" "${FIRMWARE_USER_DIR}" \
+  "FIRMWARE_KEYMAP_DIR" "${FIRMWARE_KEYMAP_DIR}" \
+  "FIRMWARE_USERSPACES_DIR" "${FIRMWARE_USERSPACES_DIR}" \
+  "FIRMWARE_USERSPACE_DIR" "${FIRMWARE_USERSPACE_DIR}" \
+  "QMK_USER" "${QMK_USER}" \
   "RUNTIME" "${RUNTIME}" \
   "FLASH" "${FLASH}" \
   "TARGET" "${TARGET}" \
   "MAKE_COMMAND" "${MAKE_COMMAND}"
 
+if ! prompt "Looking good?"; then
+  exit 1
+fi
+
 main() { # {{{
   make --directory="${FIRMWARE_DIR}" git-submodule
   rm -rf "${FIRMWARE_DIR}/.build" \
          "${FIRMWARE_DIR}/${KEYMAP_BIN}" \
-         "${FIRMWARE_USER_DIR}" \
-         "${FIRMWARE_KEYMAPS_DIR}/${KEYMAP}"
+         "${FIRMWARE_USERSPACE_DIR}" \
+         "${FIRMWARE_KEYMAP_DIR}"
 
-  mkdir -p "${FIRMWARE_KEYMAPS_DIR}"
-  cp -r "${KEYMAPS_DIR}/${KEYMAP}" "${FIRMWARE_KEYMAPS_DIR}"
-  cp -r "$(readlink -m "${__DIR}/common")" "${FIRMWARE_USER_DIR}"
+  mkdir -p "${FIRMWARE_KEYMAPS_DIR}" \
+           "${FIRMWARE_USERSPACES_DIR}"
+  cp -r "${KEYMAP_DIR}" "${FIRMWARE_KEYMAP_DIR}"
+  cp -r "${USERSPACE_DIR}" "${FIRMWARE_USERSPACE_DIR}"
 
   cd "${FIRMWARE_DIR}"
 
   case "${RUNTIME}" in
     docker|podman) RUNTIME="${RUNTIME}" ./util/docker_build.sh "${MAKE_COMMAND}";;
     local)
+      # FIXME
       make "${MAKE_COMMAND}"
       if test -n "${TARGET}"; then
         # TODO python3 -m pip install -r /qmk_firmware/requirements.txt
-        # FIXME
         # TODO Flash binary file
         qmk flash "${KEYMAP_BIN}" --bootloader "${TARGET}"
       fi;;
