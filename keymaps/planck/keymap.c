@@ -229,11 +229,7 @@ void set_layer_color(uint8_t layer) {
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #ifdef AUDIO_ENABLE
   static float no_sound[][2] = SONG(NO_SOUND);
-  static float megalovania[][2] = SONG(MEGALOVANIA);
   static float among_us[][2] = SONG(AMONG_US);
-  static float ussr_anthem[][2] = SONG(USSR_ANTHEM);
-  static float michishirube[][2] = SONG(MICHISHIRUBE);
-  static float rick_roll[][2] = SONG(RICK_ROLL);
   static float slay_soul_sister[][2] = SONG(SLAY_SOUL_SISTER);
 #endif
 
@@ -286,42 +282,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case MU_STOP:
       if (record->event.pressed) {
         PLAY_SONG(no_sound);
-      }
-      return false;
-      break;
-    case MU_MGLV:
-      if (record->event.pressed) {
-        PLAY_SONG(megalovania);
-      }
-      return false;
-      break;
-    case MU_USSR:
-      if (record->event.pressed) {
-        PLAY_SONG(ussr_anthem);
-      }
-      return false;
-      break;
-    case MU_MCSR:
-      if (record->event.pressed) {
-        PLAY_SONG(michishirube);
-      }
-      return false;
-      break;
-    case MU_ROLL:
-      if (record->event.pressed) {
-        PLAY_SONG(rick_roll);
-      }
-      return false;
-      break;
-    case MU_SUSS:
-      if (record->event.pressed) {
-        PLAY_SONG(among_us);
-      }
-      return false;
-      break;
-    case MU_SLAY:
-      if (record->event.pressed) {
-        PLAY_SONG(slay_soul_sister);
       }
       return false;
       break;
