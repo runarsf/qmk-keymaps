@@ -13,6 +13,8 @@ enum planck_layers {
   CMB,
   QMK,
   RST,
+  SUS,
+  GAY,
 };
 
 enum planck_keycodes {
@@ -22,7 +24,17 @@ enum planck_keycodes {
   MU_USSR,
   MU_MCSR,
   MU_ROLL,
+  MU_SUSS,
+  MU_SLAY,
 };
+
+bool muse_mode = false;
+uint8_t last_muse_note = 0;
+uint16_t muse_counter = 0;
+uint8_t muse_offset = 70;
+uint16_t muse_tempo = 50;
+uint8_t sus_counter = 0;
+uint8_t slay_counter = 0;
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   /** Qwerty
@@ -119,7 +131,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * ┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┐
    * │ --- │ --- │ --- │ --- │ Rol │ --- │ --- │ Rus │ --- │ --- │ --- │ --- │
    * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-   * │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │
+   * │ --- │ SUS │ --- │ --- │ --- │ Gay │ --- │ --- │ --- │ --- │ --- │ --- │
    * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
    * │ --- │ --- │ --- │ --- │ Mch │ --- │ --- │ Mgl │ --- │ --- │ --- │ --- │
    * ├─────┼─────┼─────┼─────┼─────┼─────┴─────┼─────┼─────┼─────┼─────┼─────┤
@@ -128,18 +140,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    */
   [RST] = LAYOUT_planck_grid(
     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, MU_ROLL, XXXXXXX, XXXXXXX, MU_USSR, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+    XXXXXXX, MU_SUSS, XXXXXXX, XXXXXXX, XXXXXXX, MU_SLAY, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, MU_MCSR, XXXXXXX, XXXXXXX, MU_MGLV, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, QK_BOOT, QK_BOOT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX
   )
 };
 
-// TODO set RGB brightness
+// TODO brightness https://github.com/qmk/qmk_firmware/blob/master/docs/feature_rgb_matrix.md#examples-idindicator-examples
 const RGB ___ = {.r=0,   .g=0,   .b=0  };
-const RGB BLU = {.r=0,   .g=138, .b=255};
-const RGB LBL = {.r=162, .g=213, .b=252};
-const RGB RED = {.r=248, .g=33,  .b=33 };
+const RGB DWH = {.r=100, .g=100, .b=100};
+const RGB BLU = {.r=0,   .g=140, .b=255};
+const RGB LBL = {.r=160, .g=215, .b=255};
+const RGB RED = {.r=250, .g=30,  .b=30 };
 const RGB LRD = {.r=242, .g=153, .b=168};
+const RGB DRD = {.r=100, .g=0,   .b=0  };
 
 const RGB PROGMEM ledmap[][RGB_MATRIX_LED_COUNT] = {
   [LWR] = {
@@ -172,24 +186,39 @@ const RGB PROGMEM ledmap[][RGB_MATRIX_LED_COUNT] = {
     ___, ___, ___, ___, ___, LRD, LRD, ___, ___, ___, ___, ___,
     ___, ___, ___, ___, LRD,    RED,   LRD, ___, ___, ___, ___,
   },
+  [SUS] = {
+    ___, ___, ___, ___, DRD, DRD, DRD, ___, ___, ___, ___, ___,
+    ___, ___, ___, DRD, DRD, DWH, DWH, DRD, ___, ___, ___, ___,
+    ___, ___, ___, DRD, DRD, DRD, DRD, DRD, ___, ___, ___, ___,
+    ___, ___, ___, ___, DRD,    ___,   DRD, ___, ___, ___, ___,
+  },
 };
 
 layer_state_t layer_state_set_user(layer_state_t state) {
   return update_tri_layer_state(state, LWR, RSE, CMB);
 }
 
-bool startsWith(const char *pre, const char *str)
-{
-    size_t lenpre = strlen(pre),
-           lenstr = strlen(str);
-    return lenstr < lenpre ? false : memcmp(pre, str, lenpre) == 0;
+void set_layer_color(uint8_t layer) {
+  for (uint8_t i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
+    RGB color = ledmap[layer][i];
+    rgb_matrix_set_color(i, color.r, color.g, color.b);
+  }
 }
 
-
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+#ifdef AUDIO_ENABLE
+  static float megalovania[][2] = SONG(MEGALOVANIA);
+  static float among_us[][2] = SONG(AMONG_US);
+  static float ussr_anthem[][2] = SONG(USSR_ANTHEM);
+  static float michishirube[][2] = SONG(MICHISHIRUBE);
+  static float rick_roll[][2] = SONG(RICK_ROLL);
+  static float slay_soul_sister[][2] = SONG(SLAY_SOUL_SISTER);
+#endif
+
   static bool sarcastic = false;
   static bool capitalized = false;
   static uint8_t same = 0;
+  static uint16_t sus_word[3] = {NO_S, NO_U, NO_S};
 
   if(sarcastic && record->event.pressed) {
     if (rand() % 2 == 1 || same > 0) {
@@ -201,6 +230,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       same++;
     }
   }
+
+#ifdef AUDIO_ENABLE
+  if (record->event.pressed) {
+    sus_counter = (keycode == sus_word[sus_counter]) ? sus_counter+1 : 0;
+    if (sus_counter >= 3) {
+      PLAY_SONG(among_us);
+    }
+  }
+#endif
 
   switch (keycode) {
     case SARCASM:
@@ -215,29 +253,37 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       break;
     case MU_MGLV:
       if (record->event.pressed) {
-        static float megalovania[][2] = SONG(MEGALOVANIA);
         PLAY_SONG(megalovania);
       }
       return false;
       break;
     case MU_USSR:
       if (record->event.pressed) {
-        static float ussr_anthem[][2] = SONG(USSR_ANTHEM);
         PLAY_SONG(ussr_anthem);
       }
       return false;
       break;
     case MU_MCSR:
       if (record->event.pressed) {
-        static float michishirube[][2] = SONG(MICHISHIRUBE);
         PLAY_SONG(michishirube);
       }
       return false;
       break;
     case MU_ROLL:
       if (record->event.pressed) {
-        static float rick_roll[][2] = SONG(RICK_ROLL);
         PLAY_SONG(rick_roll);
+      }
+      return false;
+      break;
+    case MU_SUSS:
+      if (record->event.pressed) {
+        PLAY_SONG(among_us);
+      }
+      return false;
+      break;
+    case MU_SLAY:
+      if (record->event.pressed) {
+        PLAY_SONG(slay_soul_sister);
       }
       return false;
       break;
@@ -245,19 +291,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   return true;
 };
 
-void set_layer_color(uint8_t layer) {
-  for (uint8_t i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
-    RGB color = ledmap[layer][i];
-    rgb_matrix_set_color(i, color.r, color.g, color.b);
-  }
-}
-
 bool rgb_matrix_indicators_user(void) {
   // TODO clear leds on QTY when returning
   uint8_t layer = biton32(layer_state);
 
   if (layer != QTY) {
     set_layer_color(layer);
+  } else if (sus_counter >= 3) {
+    set_layer_color(SUS);
   } else if (host_keyboard_led_state().caps_lock) {
     rgb_matrix_set_color_all(0, 0, 0);
     rgb_matrix_set_color(24, 255, 255, 255);
@@ -265,12 +306,6 @@ bool rgb_matrix_indicators_user(void) {
 
   return true;
 }
-
-bool muse_mode = false;
-uint8_t last_muse_note = 0;
-uint16_t muse_counter = 0;
-uint8_t muse_offset = 70;
-uint16_t muse_tempo = 50;
 
 void matrix_scan_user(void) {
 #ifdef AUDIO_ENABLE

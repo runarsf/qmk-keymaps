@@ -151,4 +151,35 @@
     HD_NOTE(_A4), QD_NOTE(_F4),  QD_NOTE(_C5), WD_NOTE(_A4), \
     HD_NOTE(_E5), HD_NOTE(_E5), HD_NOTE(_E5), QD_NOTE(_F5), QD_NOTE(_C5), \
     HD_NOTE(_A4), QD_NOTE(_F4),  QD_NOTE(_C5), WD_NOTE(_A4),
+
+  #define AMONG_US \
+    W__NOTE(_C3), \
+    H__NOTE(_C5), \
+    H__NOTE(_DS5), \
+    H__NOTE(_F5), \
+    H__NOTE(_FS5), \
+    H__NOTE(_F5), \
+    H__NOTE(_DS5), \
+    W__NOTE(_C5), \
+    Q__NOTE(_REST), \
+    Q__NOTE(_AS4), \
+    Q__NOTE(_D5), \
+    W__NOTE(_C5),
+
+  #define SLAY_SOUL_SISTER \
+    W__NOTE(_BF4), \
+    E__NOTE(_REST), \
+    H__NOTE(_F4), \
+    H__NOTE(_F4), \
+    H__NOTE(_BF4), \
+    H__NOTE(_C5), \
+    W__NOTE(_BF4), \
+    Q__NOTE(_REST), \
+    H__NOTE(_F4), \
+    H__NOTE(_F4), \
+    H__NOTE(_F4), \
+    W__NOTE(_BF4), \
+    W__NOTE(_D4), \
+    W__NOTE(_EF4), \
+    W__NOTE(_REST), \
 #endif
