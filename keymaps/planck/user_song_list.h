@@ -182,4 +182,14 @@
     W__NOTE(_D4), \
     W__NOTE(_EF4), \
     W__NOTE(_REST), \
+    W__NOTE(_B5), \
+    W__NOTE(_GS5), \
+    H__NOTE(_FS5), \
+    W__NOTE(_E5), \
+    W__NOTE(_B5), \
+    H__NOTE(_B5), \
+    H__NOTE(_GS5), \
+    H__NOTE(_GS5), \
+    H__NOTE(_FS5), \
+    H__NOTE(_E5),
 #endif
