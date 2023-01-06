@@ -8,6 +8,7 @@
 
 enum planck_layers {
   QTY,
+  SLR,
   LWR,
   RSE,
   CMB,
@@ -55,6 +56,24 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_TAB,  NO_A,    NO_S,    NO_D,    NO_F,    NO_G,    NO_H,    NO_J,    NO_K,    NO_L,    NO_QUOT, KC_DEL,
     KC_LSFT, NO_Z,    NO_X,    NO_C,    NO_V,    NO_B,    NO_N,    NO_M,    NO_COMM, NO_DOT,  NO_MINS, KC_ENT,
     KC_LCTL, TT(QMK), KC_LGUI, KC_LALT, MO(LWR), KC_SPC,  KC_SPC,  MO(RSE), KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT
+  ),
+
+  /** Swap Lower & Raise
+   * ┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┐
+   * │     │     │     │     │     │     │     │     │     │     │     │     │
+   * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+   * │     │     │     │     │     │     │     │     │     │     │     │     │
+   * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+   * │     │     │     │     │     │     │     │     │     │     │     │     │
+   * ├─────┼─────┼─────┼─────┼─────┼─────┴─────┼─────┼─────┼─────┼─────┼─────┤
+   * │     │     │     │     │ RSE │           │ LWR │     │     │     │     │
+   * └─────┴─────┴─────┴─────┴─────┴───────────┴─────┴─────┴─────┴─────┴─────┘
+   */
+  [SLR] = LAYOUT_planck_grid(
+    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+    _______, _______, _______, _______, MO(RSE), _______, _______, MO(LWR), _______, _______, _______, _______
   ),
 
   /** Lower
@@ -131,9 +150,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   /** Reset
    * ┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┐
-   * │ --- │ --- │ --- │ --- │ Rol │ --- │ --- │ Rus │ --- │ --- │ --- │ --- │
+   * │ QTY │ --- │ --- │ --- │ Rol │ --- │ --- │ Rus │ --- │ --- │ --- │ --- │
    * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-   * │ --- │ SUS │ --- │ --- │ --- │ Gay │ --- │ --- │ --- │ --- │ --- │ --- │
+   * │ SLR │ SUS │ --- │ --- │ --- │ Gay │ --- │ --- │ --- │ --- │ --- │ --- │
    * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
    * │ --- │ --- │ --- │ --- │ Mch │ --- │ --- │ Mgl │ --- │ --- │ --- │ --- │
    * ├─────┼─────┼─────┼─────┼─────┼─────┴─────┼─────┼─────┼─────┼─────┼─────┤
@@ -141,8 +160,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * └─────┴─────┴─────┴─────┴─────┴───────────┴─────┴─────┴─────┴─────┴─────┘
    */
   [RST] = LAYOUT_planck_grid(
-    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, MU_ROLL, XXXXXXX, XXXXXXX, MU_USSR, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-    XXXXXXX, MU_SUSS, XXXXXXX, XXXXXXX, XXXXXXX, MU_SLAY, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+    DF(QTY), XXXXXXX, XXXXXXX, XXXXXXX, MU_ROLL, XXXXXXX, XXXXXXX, MU_USSR, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+    DF(SLR), MU_SUSS, XXXXXXX, XXXXXXX, XXXXXXX, MU_SLAY, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, MU_MCSR, XXXXXXX, XXXXXXX, MU_MGLV, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, QK_BOOT, QK_BOOT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX
   )
