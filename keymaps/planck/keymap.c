@@ -20,6 +20,7 @@ enum planck_layers {
 enum planck_keycodes {
   PLACEHOLDER = SAFE_RANGE,
   SARCASM,
+  MU_STOP,
   MU_MGLV,
   MU_USSR,
   MU_MCSR,
@@ -96,17 +97,17 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * ┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┐
    * │ F01 │ F02 │ F03 │ F04 │ F05 │ F06 │ F07 │ F08 │ F09 │ F10 │ F11 │ F12 │
    * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-   * │ --- │ --- │ --- │ --- │ MuT │ MuM │ --- │ Mod │ SaI │ HuI │ VaI │ Tog │
+   * │ --- │ --- │ --- │ MuM │ MuT │ --- │ --- │ Mod │ SaI │ HuI │ VaI │ Tog │
    * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-   * │ CwT │ --- │ --- │ --- │ AuT │ --- │ --- │ Rmd │ SaD │ HuD │ VaD │ --- │
+   * │ CwT │ --- │ --- │ MuS │ AuT │ --- │ --- │ Rmd │ SaD │ HuD │ VaD │ --- │
    * ├─────┼─────┼─────┼─────┼─────┼─────┴─────┼─────┼─────┼─────┼─────┼─────┤
    * │ --- │ --- │ --- │ --- │ [_] │ PlayPause │ [_] │ Prv │ Vo- │ Vo+ │ Nxt │
    * └─────┴─────┴─────┴─────┴─────┴───────────┴─────┴─────┴─────┴─────┴─────┘
    */
   [CMB] = LAYOUT_planck_grid(
     KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,    KC_F9,   KC_F10,  KC_F11,  KC_F12,
-    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, MU_TOG,  MU_MOD,  XXXXXXX, RGB_MOD,  RGB_SAI, RGB_HUI, RGB_VAI, RGB_TOG,
-    CW_TOGG, XXXXXXX, XXXXXXX, XXXXXXX, AU_TOG,  XXXXXXX, XXXXXXX, RGB_RMOD, RGB_SAD, RGB_HUD, RGB_VAD, XXXXXXX,
+    XXXXXXX, XXXXXXX, XXXXXXX, MU_MOD,  MU_TOG,  XXXXXXX, XXXXXXX, RGB_MOD,  RGB_SAI, RGB_HUI, RGB_VAI, RGB_TOG,
+    CW_TOGG, XXXXXXX, XXXXXXX, MU_STOP, AU_TOG,  XXXXXXX, XXXXXXX, RGB_RMOD, RGB_SAD, RGB_HUD, RGB_VAD, XXXXXXX,
     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______, KC_MPLY, KC_MPLY, _______,  KC_MPRV, KC_VOLD, KC_VOLU, KC_MNXT
   ),
 
@@ -208,6 +209,7 @@ void set_layer_color(uint8_t layer) {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #ifdef AUDIO_ENABLE
+  static float no_sound[][2] = SONG(NO_SOUND);
   static float megalovania[][2] = SONG(MEGALOVANIA);
   static float among_us[][2] = SONG(AMONG_US);
   static float ussr_anthem[][2] = SONG(USSR_ANTHEM);
@@ -259,6 +261,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
           register_code(KC_CAPS);
           unregister_code(KC_CAPS);
         }
+      }
+      return false;
+      break;
+    case MU_STOP:
+      if (record->event.pressed) {
+        PLAY_SONG(no_sound);
       }
       return false;
       break;
