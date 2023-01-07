@@ -15,7 +15,6 @@ enum planck_layers {
   QMK,
   RST,
   SUS,
-  GAY,
 };
 
 enum planck_keycodes {
@@ -150,19 +149,19 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   /** Reset
    * ┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┐
-   * │ QTY │ --- │ --- │ --- │ Rol │ --- │ --- │ Rus │ --- │ --- │ --- │ --- │
+   * │ QTY │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │
    * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-   * │ SLR │ SUS │ --- │ --- │ --- │ Gay │ --- │ --- │ --- │ --- │ --- │ --- │
+   * │ SLR │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │
    * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-   * │ --- │ --- │ --- │ --- │ Mch │ --- │ --- │ Mgl │ --- │ --- │ --- │ --- │
+   * │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │ --- │
    * ├─────┼─────┼─────┼─────┼─────┼─────┴─────┼─────┼─────┼─────┼─────┼─────┤
    * │ --- │ --- │ --- │ --- │ --- │   Reset   │ --- │ --- │ --- │ --- │ --- │
    * └─────┴─────┴─────┴─────┴─────┴───────────┴─────┴─────┴─────┴─────┴─────┘
    */
   [RST] = LAYOUT_planck_grid(
-    DF(QTY), XXXXXXX, XXXXXXX, XXXXXXX, MU_ROLL, XXXXXXX, XXXXXXX, MU_USSR, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-    DF(SLR), MU_SUSS, XXXXXXX, XXXXXXX, XXXXXXX, MU_SLAY, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, MU_MCSR, XXXXXXX, XXXXXXX, MU_MGLV, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+    DF(QTY), XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+    DF(SLR), XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, QK_BOOT, QK_BOOT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX
   )
 };
@@ -227,16 +226,20 @@ void set_layer_color(uint8_t layer) {
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-#ifdef AUDIO_ENABLE
+  static bool sarcastic = false;
+  static bool capitalized = false;
+  static uint8_t same = 0;
   static uint16_t sus_word[3] = {NO_S, NO_U, NO_S};
-  static uint16_t slay_word[4] = {NO_S, NO_L, NO_A, NO_Y};
   static uint16_t gay_word[3] = {NO_G, NO_A, NO_Y};
+  static uint16_t slay_word[4] = {NO_S, NO_L, NO_A, NO_Y};
+
+#ifdef AUDIO_ENABLE
   static float no_sound[][2] = SONG(NO_SOUND);
   static float among_us[][2] = SONG(AMONG_US);
   static float slay_soul_sister[][2] = SONG(SLAY_SOUL_SISTER);
 
   if (record->event.pressed) {
-    wsus_counter = (keycode == sus_word[sus_counter]) ? sus_counter+1 : 0;
+    sus_counter = (keycode == sus_word[sus_counter]) ? sus_counter+1 : 0;
     slay_counter = (keycode == slay_word[slay_counter]) ? slay_counter+1 : 0;
     gay_counter = (keycode == gay_word[gay_counter]) ? gay_counter+1 : 0;
     if (sus_counter >= 3) {
@@ -247,10 +250,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     }
   }
 #endif
-
-  static bool sarcastic = false;
-  static bool capitalized = false;
-  static uint8_t same = 0;
 
   if(sarcastic && record->event.pressed) {
     if (rand() % 2 == 1 || same > 0) {

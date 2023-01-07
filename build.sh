@@ -40,6 +40,8 @@ prompt () { # {{{
   esac
 } # }}}
 
+# TODO Only checkout if git hashes diverge
+# TODO Use --git-dir for all git commands
 firmware_lock() { # {{{
   if test ! -d "${FIRMWARE_DIR}"; then
     git clone "https://github.com/qmk/qmk_firmware" "${FIRMWARE_DIR}"
