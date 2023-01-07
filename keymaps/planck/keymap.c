@@ -228,17 +228,29 @@ void set_layer_color(uint8_t layer) {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #ifdef AUDIO_ENABLE
+  static uint16_t sus_word[3] = {NO_S, NO_U, NO_S};
+  static uint16_t slay_word[4] = {NO_S, NO_L, NO_A, NO_Y};
+  static uint16_t gay_word[3] = {NO_G, NO_A, NO_Y};
   static float no_sound[][2] = SONG(NO_SOUND);
   static float among_us[][2] = SONG(AMONG_US);
   static float slay_soul_sister[][2] = SONG(SLAY_SOUL_SISTER);
+
+  if (record->event.pressed) {
+    wsus_counter = (keycode == sus_word[sus_counter]) ? sus_counter+1 : 0;
+    slay_counter = (keycode == slay_word[slay_counter]) ? slay_counter+1 : 0;
+    gay_counter = (keycode == gay_word[gay_counter]) ? gay_counter+1 : 0;
+    if (sus_counter >= 3) {
+      PLAY_SONG(among_us);
+    }
+    if (gay_counter >= 3 || slay_counter >= 4) {
+      PLAY_SONG(slay_soul_sister);
+    }
+  }
 #endif
 
   static bool sarcastic = false;
   static bool capitalized = false;
   static uint8_t same = 0;
-  static uint16_t sus_word[3] = {NO_S, NO_U, NO_S};
-  static uint16_t slay_word[4] = {NO_S, NO_L, NO_A, NO_Y};
-  static uint16_t gay_word[3] = {NO_G, NO_A, NO_Y};
 
   if(sarcastic && record->event.pressed) {
     if (rand() % 2 == 1 || same > 0) {
@@ -250,23 +262,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       same++;
     }
   }
-
-#ifdef AUDIO_ENABLE
-  if (record->event.pressed) {
-    sus_counter = (keycode == sus_word[sus_counter]) ? sus_counter+1 : 0;
-    if (sus_counter >= 3) {
-      PLAY_SONG(among_us);
-    }
-    slay_counter = (keycode == slay_word[slay_counter]) ? slay_counter+1 : 0;
-    if (slay_counter >= 4) {
-      PLAY_SONG(slay_soul_sister);
-    }
-    gay_counter = (keycode == gay_word[gay_counter]) ? gay_counter+1 : 0;
-    if (gay_counter >= 3) {
-      PLAY_SONG(slay_soul_sister);
-    }
-  }
-#endif
 
   switch (keycode) {
     case SARCASM:
