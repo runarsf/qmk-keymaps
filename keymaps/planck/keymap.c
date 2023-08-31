@@ -131,20 +131,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   /** QMK
    * ┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┐
-   * │ Lck │ MwD │ MsU │ MwU │ Rec │ N07 │ N08 │ N09 │ --- │ --- │ --- │ RST │
+   * │     │ Ms2 │ MsU │ Ms1 │ MwU │ N07 │ N08 │ N09 │ Rec │ --- │ RST │     │
    * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-   * │ --- │ MsL │ MsD │ MsR │ Ply │ N04 │ N05 │ N06 │ --- │ --- │ --- │ SRC │
+   * │     │ MsL │ MsD │ MsR │ MwD │ N04 │ N05 │ N06 │ Ply │ Lck │ SRC │     │
    * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-   * │ --- │ --- │ --- │ --- │ --- │ N01 │ N02 │ N03 │ --- │ --- │ --- │ --- │
+   * │     │ --- │ --- │ --- │ --- │ N01 │ N02 │ N03 │     │     │     │     │
    * ├─────┼─────┼─────┼─────┼─────┼─────┴─────┼─────┼─────┼─────┼─────┼─────┤
-   * │ --- │ [_] │ --- │ Ms2 │ Ms1 │  NumPad0  │ NLk │ --- │ --- │ --- │ --- │
+   * │     │ [_] │     │     │ Ms1 │  NumPad0  │ NLk │     │     │     │     │
    * └─────┴─────┴─────┴─────┴─────┴───────────┴─────┴─────┴─────┴─────┴─────┘
    */
   [QMK] = LAYOUT_planck_grid(
-    QK_LOCK, KC_WH_D, KC_MS_U, KC_WH_U, DM_REC1, KC_KP_7, KC_KP_8, KC_KP_9, XXXXXXX, XXXXXXX, XXXXXXX, MO(RST),
-    XXXXXXX, KC_MS_L, KC_MS_D, KC_MS_R, DM_PLY1, KC_KP_4, KC_KP_5, KC_KP_6, XXXXXXX, XXXXXXX, XXXXXXX, SARCASM,
-    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_KP_1, KC_KP_2, KC_KP_3, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-    XXXXXXX, _______, XXXXXXX, KC_BTN2, KC_BTN1, KC_KP_0, KC_KP_0, KC_NUM,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX
+    _______, KC_BTN2, KC_MS_U, KC_BTN1, KC_WH_U, KC_KP_7, KC_KP_8, KC_KP_9, DM_REC1, XXXXXXX, MO(RST), _______,
+    _______, KC_MS_L, KC_MS_D, KC_MS_R, KC_WH_D, KC_KP_4, KC_KP_5, KC_KP_6, DM_PLY1, QK_LOCK, SARCASM, _______,
+    _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_KP_1, KC_KP_2, KC_KP_3, _______, _______, _______, _______,
+    _______, _______, _______, _______, KC_BTN1, KC_KP_0, KC_KP_0, KC_NUM,  _______, _______, _______, _______
   ),
 
   /** Reset
@@ -195,8 +195,8 @@ const RGB PROGMEM ledmap[][RGB_MATRIX_LED_COUNT] = {
     BLU, BLU, BLU, BLU, BLU,    BLU,   BLU, BLU, BLU, BLU, BLU,
   },
   [QMK] = {
-    LBL, ___, BLU, ___, ___, LBL, LBL, LBL, ___, ___, ___, RED,
-    ___, BLU, BLU, BLU, ___, LBL, LBL, LBL, ___, ___, ___, LBL,
+    LBL, ___, BLU, ___, ___, LBL, LBL, LBL, ___, ___, RED, ___,
+    ___, BLU, BLU, BLU, ___, LBL, LBL, LBL, ___, ___, LBL, ___,
     ___, ___, ___, ___, ___, LBL, LBL, LBL, ___, ___, ___, ___,
     ___, ___, ___, ___, ___,    LBL,   BLU, ___, ___, ___, ___,
   },

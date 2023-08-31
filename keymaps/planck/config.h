@@ -6,6 +6,9 @@
 
 #define ENCODER_RESOLUTION 4
 
+#undef DEBOUNCE
+#define DEBOUNCE 7
+
 #define MIDI_BASIC
 
 #define AUDIO_ENABLE_TONE_MULTIPLEXING
