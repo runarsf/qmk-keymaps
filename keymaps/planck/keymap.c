@@ -117,7 +117,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
    * │ --- │ --- │ --- │ MuM │ MuT │ --- │ --- │ Mod │ SaI │ HuI │ VaI │ Tog │
    * ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-   * │ CwT │ --- │ --- │ MuS │ AuT │ --- │ --- │ Rmd │ SaD │ HuD │ VaD │ --- │
+   * │ CwT │ --- │ --- │ MuS │ AuT │ Mut │ Mic │ Rmd │ SaD │ HuD │ VaD │ --- │
    * ├─────┼─────┼─────┼─────┼─────┼─────┴─────┼─────┼─────┼─────┼─────┼─────┤
    * │ --- │ --- │ --- │ --- │ [_] │ PlayPause │ [_] │ Prv │ Vo- │ Vo+ │ Nxt │
    * └─────┴─────┴─────┴─────┴─────┴───────────┴─────┴─────┴─────┴─────┴─────┘
@@ -125,7 +125,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [CMB] = LAYOUT_planck_grid(
     KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,    KC_F9,   KC_F10,  KC_F11,  KC_F12,
     XXXXXXX, XXXXXXX, XXXXXXX, MU_MOD,  MU_TOG,  XXXXXXX, XXXXXXX, RGB_MOD,  RGB_SAI, RGB_HUI, RGB_VAI, RGB_TOG,
-    CW_TOGG, XXXXXXX, XXXXXXX, MU_STOP, AU_TOG,  XXXXXXX, XXXXXXX, RGB_RMOD, RGB_SAD, RGB_HUD, RGB_VAD, XXXXXXX,
+    CW_TOGG, XXXXXXX, XXXXXXX, MU_STOP, AU_TOG,  KC_MUTE, KC_F20,  RGB_RMOD, RGB_SAD, RGB_HUD, RGB_VAD, XXXXXXX,
     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______, KC_MPLY, KC_MPLY, _______,  KC_MPRV, KC_VOLD, KC_VOLU, KC_MNXT
   ),
 
