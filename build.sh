@@ -1,7 +1,8 @@
-#!/usr/bin/env dash
-# TODO #!/usr/bin/env bash
+#!/usr/bin/env bash
+
 set -o errexit
 set -o nounset
+set -o pipefail
 
 # TODO migrate to userspace (QMK_USER) instead of KEYMAP
 # TODO image extension (hex/bin)
@@ -19,6 +20,11 @@ known_keymaps() { # keymap -> KEYBOARD, KEYMAP, BOOTLOADER, MAKE_COMMAND {{{
     planck)
       _KEYBOARD=planck/ez/glow
       _TARGET=dfu-util;;
+    air40)
+      _KEYBOARD='ymdk/ymd40/air40'
+      _TARGET=flash
+      _EXTENSION='hex'
+      ;;
     *)
       if test ! -d "${KEYMAPS_DIR}/${KEYMAP}" -o -z "${KEYBOARD}"; then
         printf '%s\n' "Error: Unknown or not properly formatted keymap: ${KEYMAP}"
@@ -27,6 +33,7 @@ known_keymaps() { # keymap -> KEYBOARD, KEYMAP, BOOTLOADER, MAKE_COMMAND {{{
   esac
   : "${KEYBOARD:=${_KEYBOARD}}"
   : "${TARGET:=${FLASH:+${_TARGET}}}"
+  : "${EXTENSION:=${_EXTENSION:-bin}}"
 } # }}}
 
 prompt () { # {{{
@@ -76,7 +83,7 @@ arrstash () { # {{{
 } # }}}
 
 # Argument parsing {{{
-RUNTIME="docker" QMK_USER="${USER}" BIN_EXTENSION="bin" POSITIONALS="" FLASH="" TARGET="" KEYBOARD="" KEYMAP=""
+RUNTIME="docker" QMK_USER="${USER}" EXTENSION="" POSITIONALS="" FLASH="" TARGET="" KEYBOARD="" KEYMAP=""
 while test "${#}" -gt "0"; do
   case "$(printf '%s' "${1}" | tr '[:upper:]' '[:lower:]')" in
     # -h|--help)
@@ -91,7 +98,7 @@ while test "${#}" -gt "0"; do
       KEYBOARD="${2}"
       shift;;
     -e|--extension)
-      BIN_EXTENSION="${2}"
+      EXTENSION="${2}"
       shift;;
     -u|--user)
       QMK_USER="${2}"
@@ -134,7 +141,7 @@ else
 fi
 MAKE_COMMAND="${KEYBOARD}:${QMK_USER}${TARGET:+:${TARGET}}"
 KEYMAP_DIR="${KEYMAPS_DIR}/${KEYMAP}"
-KEYMAP_BIN="$(printf '%s' "${KEYBOARD}_${QMK_USER}" | sed -e 's/[^A-Za-z0-9._-]/_/g').${BIN_EXTENSION}"
+KEYMAP_BIN="$(printf '%s' "${KEYBOARD}_${QMK_USER}" | sed -e 's/[^A-Za-z0-9._-]/_/g').${EXTENSION}"
 USERSPACE_DIR=$(readlink -m "${__DIR}/common")
 FIRMWARE_KEYMAPS_DIR="$(readlink -m "${FIRMWARE_DIR}/keyboards/${KEYBOARD}/keymaps")"
 FIRMWARE_KEYMAP_DIR="${FIRMWARE_KEYMAPS_DIR}/${QMK_USER}"
@@ -162,8 +169,8 @@ prompt "Looking good?"
 
 main() { # {{{
   make --directory="${FIRMWARE_DIR}" git-submodule
-  rm -rf "${FIRMWARE_DIR}/.build" \
-         "${FIRMWARE_DIR}/${KEYMAP_BIN}" \
+  rm -rf "${FIRMWARE_DIR:?}/.build" \
+         "${FIRMWARE_DIR:?}/${KEYMAP_BIN}" \
          "${FIRMWARE_USERSPACE_DIR}" \
          "${FIRMWARE_KEYMAP_DIR}"
 
@@ -180,8 +187,6 @@ main() { # {{{
       # FIXME
       make "${MAKE_COMMAND}"
       if test -n "${TARGET}"; then
-        # TODO python3 -m pip install -r /qmk_firmware/requirements.txt
-        # TODO Flash binary file
         qmk flash "${KEYMAP_BIN}" --bootloader "${TARGET}"
       fi;;
   esac
