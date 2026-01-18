@@ -203,6 +203,7 @@ uint8_t mod_config(uint8_t mod) { return mod; }
 #endif
 
 const RGB ___ = {.r = 0, .g = 0, .b = 0};
+// TODO: Could this be 256 instead?
 const RGB ANIM = {.r = 255, .g = 255, .b = 255};
 const RGB BLUE = {.r = 0, .g = 140, .b = 255};
 const RGB RED = {.r = 255, .g = 0, .b = 0};
@@ -233,60 +234,62 @@ const RGB layer_colors[LAYER_COUNT][4][12] = {
     [LWR] = {{ANIM, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___},
              {ANIM, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___},
              {ANIM, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___},
-             {ANIM, ANIM, ANIM, ANIM, ___, ___, ___, ___, ___, ___, ___, ___}},
+             {ANIM, ANIM, ANIM, ANIM, ANIM, ___, ___, ___, ___, ___, ___, ___}},
 
     [RSE] = {{___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ANIM},
              {___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ANIM},
              {___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ANIM},
-             {___, ___, ___, ___, ___, ___, ___, ___, ANIM, ANIM, ANIM, ANIM}},
+             {___, ___, ___, ___, ___, ___, ___, ANIM, ANIM, ANIM, ANIM, ANIM}},
 
-    [CMB] = {{ANIM, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ANIM},
-             {ANIM, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ANIM},
-             {ANIM, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ANIM},
-             {ANIM, ANIM, ANIM, ANIM, ANIM, ___, ___, ANIM, ANIM, ANIM, ANIM,
-              ANIM}},
+    [CMB] = {{ANIM, ANIM, ANIM, ANIM, ANIM, ANIM, ANIM, ANIM, ANIM, ANIM, ANIM,
+              ANIM},
+             {___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, RED},
+             {___, BLUE, BLUE, ___, ___, ___, ___, ___, ___, ___, YELLOW, ___},
+             {___, ___, ___, ___, ___, GREEN, GREEN, ___, GREEN, GREEN, GREEN,
+              GREEN}},
 
     [QMK] = {{___, ___, ANIM, ___, ___, BLUE, BLUE, BLUE, ___, ___, ___, ___},
              {___, ANIM, ANIM, ANIM, ___, BLUE, BLUE, BLUE, ___, ___, ___, ___},
              {___, ___, ___, ___, ___, BLUE, BLUE, BLUE, ___, ___, ___, ___},
-             {___, ___, ___, ___, ___, BLUE, ___, ___, ___, ___, ___, ___}}};
+             {___, ___, ___, ___, ___, BLUE, ___, ___, ___, ___, ___, ___}},
+};
 
 uint8_t get_led_index(uint8_t row, uint8_t col) {
   // Handle special case for spacebar (indices 42, 44, 45 don't exist in
   // matrix)
-  // if (row == 3 && (col == 5 || col == 6)) {
-  //   // Spacebar positions - map to actual LED indices
-  //   return (col == 5) ? 43 : 41; // Based on the matrix layout in led.c
-  // }
+  if (row == 3 && (col == 5 || col == 6)) {
+    // Spacebar positions - map to actual LED indices
+    return (col == 5) ? 43 : 41; // Based on the matrix layout in led.c
+  }
 
   return g_led_config.matrix_co[row][col];
 }
 
-// Function to apply layer colors
 void set_layer_colors(uint8_t layer) {
   if (layer >= LAYER_COUNT)
     return;
+
+  // Get current brightness level
+  uint8_t brightness = rgb_matrix_get_val();
 
   for (uint8_t row = 0; row < 4; row++) {
     for (uint8_t col = 0; col < 12; col++) {
       RGB color = layer_colors[layer][row][col];
       uint8_t led_index = get_led_index(row, col);
 
-      // Check if this key should follow animation
       if (color.r == 255 && color.g == 255 && color.b == 255) {
-        // ANIM marker - skip this LED, let RGB matrix animation handle it
         continue;
-      }
-      // Set static color (including black for ___)
-      else {
-        rgb_matrix_set_color(led_index, color.r, color.g, color.b);
+      } else {
+        uint8_t scaled_r = (color.r * brightness) / 255;
+        uint8_t scaled_g = (color.g * brightness) / 255;
+        uint8_t scaled_b = (color.b * brightness) / 255;
+        rgb_matrix_set_color(led_index, scaled_r, scaled_g, scaled_b);
       }
     }
   }
 }
 
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
-  // Get the current highest layer
   uint8_t current_layer = get_highest_layer(layer_state);
 
   // For layers other than QTY, turn off all LEDs first
@@ -299,6 +302,28 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
   // Apply the colors for the current layer
   set_layer_colors(current_layer);
 
+  if (current_layer < LAYER_COUNT) {
+    uint8_t brightness = rgb_matrix_get_val();
+
+    // LEDs 42 and 44 (around spacebar) are orphaned, we need to set them
+    // manually
+    RGB color_left = layer_colors[current_layer][3][5];
+    RGB color_right = layer_colors[current_layer][3][6];
+
+    // Only set if not ANIM (let animation show through)
+    if (!(color_left.r == 255 && color_left.g == 255 && color_left.b == 255)) {
+      rgb_matrix_set_color(42, (color_left.r * brightness) / 255,
+                           (color_left.g * brightness) / 255,
+                           (color_left.b * brightness) / 255);
+    }
+    if (!(color_right.r == 255 && color_right.g == 255 &&
+          color_right.b == 255)) {
+      rgb_matrix_set_color(44, (color_right.r * brightness) / 255,
+                           (color_right.g * brightness) / 255,
+                           (color_right.b * brightness) / 255);
+    }
+  }
+
   // Always disable problematic spacebar LEDs
   // int disable_leds[] = {42, 44, 45};
   // for (int i = 0; i < sizeof(disable_leds) / sizeof(disable_leds[0]); i++) {
@@ -306,6 +331,15 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
   //     rgb_matrix_set_color(disable_leds[i], 0, 0, 0);
   //   }
   // }
+
+  int disable_leds[4] = {
+      41, 45, // When using a 1x2u spacebar, these LEDs shine between the
+              // keycaps on the side.
+      42, 44  // These LEDs shine a bit too bright when using a 1x2u spacebar.
+  };
+  for (int i = 0; i < sizeof(disable_leds) / sizeof(disable_leds[0]); i++) {
+    rgb_matrix_set_color(disable_leds[i], 0, 0, 0);
+  }
 
   return false;
 }
