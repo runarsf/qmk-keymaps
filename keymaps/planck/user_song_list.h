@@ -9,6 +9,15 @@
     HD_NOTE(_A4), H__NOTE(_AF4), H__NOTE(_G4), H__NOTE(_F4), Q__NOTE(_D4), Q__NOTE(_F4), \
     Q__NOTE(_G4),
 
+  #undef SAMSUNG_WASHING_MACHINE
+  #define SAMSUNG_WASHING_MACHINE \
+    H__NOTE(_E5), H__NOTE(_A5), H__NOTE(_A5), H__NOTE(_CS6), H__NOTE(_CS6), W__NOTE(_A5), H__NOTE(_E5), H__NOTE(_E5), M__NOTE(_E5, 48), Q__NOTE(_E5), Q__NOTE(_B5), Q__NOTE(_A5), Q__NOTE(_GS5), Q__NOTE(_FS5), W__NOTE(_E5), H__NOTE(_REST), \
+    H__NOTE(_E5), H__NOTE(_A5), H__NOTE(_A5), H__NOTE(_CS6), H__NOTE(_CS6), W__NOTE(_A5), H__NOTE(_E5), H__NOTE(_A5), H__NOTE(_GS5), Q__NOTE(_FS5), Q__NOTE(_GS5), H__NOTE(_A5), H__NOTE(_DS5), W__NOTE(_E5), H__NOTE(_REST), \
+    H__NOTE(_E5), H__NOTE(_GS5), H__NOTE(_GS5), Q__NOTE(_A5), Q__NOTE(_GS5), Q__NOTE(_FS5), Q__NOTE(_GS5), W__NOTE(_A5), \
+    H__NOTE(_E5), H__NOTE(_A5), H__NOTE(_GS5), H__NOTE(_GS5), Q__NOTE(_GS5), Q__NOTE(_D6), Q__NOTE(_B5), Q__NOTE(_GS5), W__NOTE(_A5), H__NOTE(_REST), \
+    H__NOTE(_A5), H__NOTE(_FS5), H__NOTE(_FS5), H__NOTE(_FS5), H__NOTE(_A5), W__NOTE(_A5), H__NOTE(_E5), H__NOTE(_E5), M__NOTE(_E5, 48), Q__NOTE(_E5), H__NOTE(_B5), H__NOTE(_GS5), W__NOTE(_A5), H__NOTE(_REST), \
+    H__NOTE(_A5), Q__NOTE(_GS5), Q__NOTE(_FS5), H__NOTE(_FS5), Q__NOTE(_FS5), Q__NOTE(_A5), Q__NOTE(_GS5), Q__NOTE(_B5), W__NOTE(_A5), H__NOTE(_E5), H__NOTE(_E5), M__NOTE(_E5, 48), Q__NOTE(_E5), H__NOTE(_B5), H__NOTE(_GS5), B__NOTE(_A5),
+
   #undef RICK_ROLL
   #define RICK_ROLL \
     Q__NOTE(_F4), \
