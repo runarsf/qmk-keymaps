@@ -1,17 +1,8 @@
 #include QMK_KEYBOARD_H
 #include "keymap_norwegian.h"
+#include "common.h"
 
 #define RECEIVE _______
-
-enum layers {
-  QTY,
-  SWP,
-  LWR,
-  RSE,
-  CMB,
-  QMK,
-  LAYER_COUNT,
-};
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /** Qwerty
@@ -36,8 +27,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_LSFT, NO_Z, NO_X, NO_C, NO_V, NO_B, NO_N, NO_M, NO_COMM, NO_DOT,
         NO_MINS, KC_ENT,
         //
-        KC_LCTL, TT(QMK), KC_LGUI, KC_LALT, MO(LWR), KC_SPC, KC_SPC, MO(RSE),
-        KC_LEFT, KC_DOWN, KC_UP, KC_RGHT),
+        KC_LCTL, TT(QMK), KC_LGUI, KC_LALT, MO(LWR), KC_SPC, KC_SPC,
+        TD(TD_RSE_QMK), KC_LEFT, KC_DOWN, KC_UP, KC_RGHT),
 
     /** Swap Lower & Raise
      * ┌───────────────────────────────────────────────────────────────────────┐
@@ -141,22 +132,22 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     /** QMK
      * ┌───────────────────────────────────────────────────────────────────────┐
-     * │     │ --- │ MsU │ --- │ --- │ N07 │ N08 │ N09 │ --- │ --- │  +  │     │
+     * │     │ Ms1 │ MsU │ Ms2 │ MwU │ N07 │ N08 │ N09 │ --- │ --- │  +  │     │
      * |───────────────────────────────────────────────────────────────────────┤
-     * │     │ MsL │ MsD │ MsR │ --- │ N04 │ N05 │ N06 │ --- │ --- │     │     │
+     * │     │ MsL │ MsD │ MsR │ MwD │ N04 │ N05 │ N06 │ --- │ --- │     │     │
      * |───────────────────────────────────────────────────────────────────────┤
      * │     │ --- │ --- │ --- │ --- │ N01 │ N02 │ N03 │     │     │     │     │
      * |───────────────────────────────────────────────────────────────────────┤
-     * │     │ [_] │     │     │ 1/2 │  NumPad0  │ NLk │     │     │     │     │
+     * │     │ [_] │     │     │ Ms1 │  NumPad0  │ NLk │     │     │     │     │
      * └───────────────────────────────────────────────────────────────────────┘
      */
     [QMK] = LAYOUT_ortho_4x12(
         //
-        _______, XXXXXXX, MS_UP, XXXXXXX, XXXXXXX, KC_KP_7, KC_KP_8, KC_KP_9,
+        _______, MS_BTN1, MS_UP, MS_BTN2, MS_WHLU, KC_KP_7, KC_KP_8, KC_KP_9,
         XXXXXXX, XXXXXXX, NO_PLUS, _______,
         //
-        _______, MS_LEFT, MS_DOWN, MS_RGHT, XXXXXXX, KC_KP_4, KC_KP_5, KC_KP_6,
-        XXXXXXX, XXXXXXX, _______, _______,
+        _______, MS_LEFT, MS_DOWN, MS_RGHT, MS_WHLD, KC_KP_4, KC_KP_5, KC_KP_6,
+        XXXXXXX, XXXXXXX, _______, QK_BOOT,
         //
         _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_KP_1, KC_KP_2, KC_KP_3,
         _______, _______, _______, _______,
@@ -165,7 +156,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______, _______, _______, _______),
 };
 
+tap_dance_action_t tap_dance_actions[] = {
+    [TD_RSE_QMK] =
+        ACTION_TAP_DANCE_FN_ADVANCED(NULL, rse_qmk_finished, rse_qmk_reset),
+};
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  static uint16_t sus_word[3] = {NO_S, NO_U, NO_S};
+
   // SHIFT+LOWER for Mouse2 in QMK layer
   if (get_highest_layer(layer_state) == QMK) {
     bool shift_held = get_mods() & MOD_MASK_SHIFT;
@@ -187,13 +185,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
       break;
     }
+
+    if (record->event.pressed) {
+      sus_counter = (keycode == sus_word[sus_counter]) ? sus_counter + 1 : 0;
+    }
   }
 
   return true;
-}
-
-layer_state_t layer_state_set_user(layer_state_t state) {
-  return update_tri_layer_state(state, LWR, RSE, CMB);
 }
 
 // Reduces firmware size
@@ -201,16 +199,6 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 uint16_t keycode_config(uint16_t keycode) { return keycode; }
 uint8_t mod_config(uint8_t mod) { return mod; }
 #endif
-
-const RGB ___ = {.r = 0, .g = 0, .b = 0};
-// TODO: Could this be 256 instead?
-const RGB ANIM = {.r = 255, .g = 255, .b = 255};
-const RGB BLUE = {.r = 0, .g = 140, .b = 255};
-const RGB RED = {.r = 255, .g = 0, .b = 0};
-const RGB GREEN = {.r = 0, .g = 255, .b = 0};
-const RGB YELLOW = {.r = 255, .g = 255, .b = 0};
-const RGB PURPLE = {.r = 128, .g = 0, .b = 128};
-const RGB CYAN = {.r = 0, .g = 255, .b = 255};
 
 const RGB layer_colors[LAYER_COUNT][4][12] = {
     [QTY] = {{ANIM, ANIM, ANIM, ANIM, ANIM, ANIM, ANIM, ANIM, ANIM, ANIM, ANIM,
@@ -252,6 +240,11 @@ const RGB layer_colors[LAYER_COUNT][4][12] = {
              {___, ANIM, ANIM, ANIM, ___, BLUE, BLUE, BLUE, ___, ___, ___, ___},
              {___, ___, ___, ___, ___, BLUE, BLUE, BLUE, ___, ___, ___, ___},
              {___, ___, ___, ___, ___, BLUE, ___, ___, ___, ___, ___, ___}},
+
+    [SUS] = {{___, ___, ___, ___, RED, RED, RED, ___, ___, ___, ___, ___},
+             {___, ___, ___, RED, RED, RED, ANIM, ANIM, ___, ___, ___, ___},
+             {___, ___, ___, RED, RED, RED, RED, ___, ___, ___, ___, ___},
+             {___, ___, ___, ___, RED, ___, RED, ___, ___, ___, ___, ___}},
 };
 
 uint8_t get_led_index(uint8_t row, uint8_t col) {
@@ -292,14 +285,6 @@ void set_layer_colors(uint8_t layer) {
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
   uint8_t current_layer = get_highest_layer(layer_state);
 
-  // For layers other than QTY, turn off all LEDs first
-  // if (current_layer != QTY) {
-  //   for (uint8_t i = led_min; i < led_max; i++) {
-  //     rgb_matrix_set_color(i, 0, 0, 0);
-  //   }
-  // }
-
-  // Apply the colors for the current layer
   set_layer_colors(current_layer);
 
   if (current_layer < LAYER_COUNT) {
@@ -309,6 +294,10 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     // manually
     RGB color_left = layer_colors[current_layer][3][5];
     RGB color_right = layer_colors[current_layer][3][6];
+
+    if (sus_counter >= 3) {
+      set_layer_colors(SUS);
+    }
 
     // Only set if not ANIM (let animation show through)
     if (!(color_left.r == 255 && color_left.g == 255 && color_left.b == 255)) {
@@ -323,14 +312,6 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
                            (color_right.b * brightness) / 255);
     }
   }
-
-  // Always disable problematic spacebar LEDs
-  // int disable_leds[] = {42, 44, 45};
-  // for (int i = 0; i < sizeof(disable_leds) / sizeof(disable_leds[0]); i++) {
-  //   if (disable_leds[i] >= led_min && disable_leds[i] < led_max) {
-  //     rgb_matrix_set_color(disable_leds[i], 0, 0, 0);
-  //   }
-  // }
 
   int disable_leds[4] = {
       41, 45, // When using a 1x2u spacebar, these LEDs shine between the
