@@ -16,6 +16,7 @@ uint16_t muse_counter = 0;
 uint8_t muse_offset = 70;
 uint16_t muse_tempo = 50;
 uint8_t slay_counter = 0;
+uint8_t wash_counter = 0;
 uint8_t gay_counter = 0;
 #endif
 
@@ -177,18 +178,30 @@ tap_dance_action_t tap_dance_actions[] = {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   static uint16_t sus_word[3] = {NO_S, NO_U, NO_S};
+  static uint16_t gay_word[3] = {NO_G, NO_A, NO_Y};
+  static uint16_t slay_word[4] = {NO_S, NO_L, NO_A, NO_Y};
+  static uint16_t wash_word[11] = {NO_P, NO_U, NO_S, NO_S, NO_Y, KC_SPC, NO_F, NO_R, NO_E, NO_S, NO_H};
 
 #ifdef AUDIO_ENABLE
   static uint16_t gay_word[3] = {NO_G, NO_A, NO_Y};
   static uint16_t slay_word[4] = {NO_S, NO_L, NO_A, NO_Y};
   static float among_us[][2] = SONG(AMONG_US);
   static float slay_soul_sister[][2] = SONG(SLAY_SOUL_SISTER);
+  static float samsung_washing_machine[][2] = SONG(SAMSUNG_WASHING_MACHINE);
 
   if (record->event.pressed) {
-    slay_counter = (keycode == slay_word[slay_counter]) ? slay_counter + 1 : 0;
-    gay_counter = (keycode == gay_word[gay_counter]) ? gay_counter + 1 : 0;
+    sus_counter = (keycode == sus_word[sus_counter]) ? sus_counter+1 : 0;
+    slay_counter = (keycode == slay_word[slay_counter]) ? slay_counter+1 : 0;
+    gay_counter = (keycode == gay_word[gay_counter]) ? gay_counter+1 : 0;
+    wash_counter = (keycode == wash_word[wash_counter]) ? wash_counter+1 : 0;
+    if (sus_counter >= 3) {
+      PLAY_SONG(among_us);
+    }
     if (gay_counter >= 3 || slay_counter >= 4) {
       PLAY_SONG(slay_soul_sister);
+    }
+    if (wash_counter >= 11) {
+      PLAY_SONG(samsung_washing_machine);
     }
   }
 #endif
