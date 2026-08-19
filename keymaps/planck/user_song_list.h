@@ -18,6 +18,13 @@
     H__NOTE(_A5), H__NOTE(_FS5), H__NOTE(_FS5), H__NOTE(_FS5), H__NOTE(_A5), W__NOTE(_A5), H__NOTE(_E5), H__NOTE(_E5), M__NOTE(_E5, 48), Q__NOTE(_E5), H__NOTE(_B5), H__NOTE(_GS5), W__NOTE(_A5), H__NOTE(_REST), \
     H__NOTE(_A5), Q__NOTE(_GS5), Q__NOTE(_FS5), H__NOTE(_FS5), Q__NOTE(_FS5), Q__NOTE(_A5), Q__NOTE(_GS5), Q__NOTE(_B5), W__NOTE(_A5), H__NOTE(_E5), H__NOTE(_E5), M__NOTE(_E5, 48), Q__NOTE(_E5), H__NOTE(_B5), H__NOTE(_GS5), B__NOTE(_A5),
 
+  #define AWESOME_SONG_WAV \
+    H__NOTE(_C2), M__NOTE(_REST, 96), H__NOTE(_D2), M__NOTE(_REST, 96), H__NOTE(_C2), H__NOTE(_REST), H__NOTE(_C2), H__NOTE(_REST), H__NOTE(_D2),
+    M__NOTE(_REST, 96),
+    H__NOTE(_C2), H__NOTE(_REST), H__NOTE(_C2), H__NOTE(_REST), H__NOTE(_D2), H__NOTE(_REST), H__NOTE(_C2), H__NOTE(_REST), H__NOTE(_FS2), H__NOTE(_REST), H__NOTE(_C2), H__NOTE(_REST), H__NOTE(_D2),
+    M__NOTE(_REST, 96),
+    Q__NOTE(_A4), Q__NOTE(_REST), Q__NOTE(_A4), B__NOTE(_D5),
+
   #undef RICK_ROLL
   #define RICK_ROLL \
     Q__NOTE(_F4), \
