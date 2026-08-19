@@ -188,7 +188,7 @@ typedef struct {
 
 #define COUNT_OF(x) (sizeof(x) / sizeof((x)[0]))
 #define NO_RGB_LAYER 0xFF
-#define RGB_FLASH_DURATION_MS 1000
+#define RGB_FLASH_DURATION_MS 5000
 
 #define WORD_SONG(word, song) {word, COUNT_OF(word), song, COUNT_OF(song), NO_RGB_LAYER}
 #define WORD_RGB(word, layer) {word, COUNT_OF(word), NULL, 0, layer}
@@ -217,6 +217,15 @@ static const word_trigger_t word_triggers[] = {
 
 static uint8_t word_trigger_progress[COUNT_OF(word_triggers)] = {0};
 static uint32_t word_trigger_rgb_hit[COUNT_OF(word_triggers)] = {0};
+
+// word_trigger_rgb_hit starts zeroed, which timer_elapsed32() would read as
+// "just triggered" for the first RGB_FLASH_DURATION_MS after boot. Back-date
+// it so nothing flashes on power-up.
+void keyboard_post_init_user(void) {
+  for (uint8_t i = 0; i < COUNT_OF(word_triggers); i++) {
+    word_trigger_rgb_hit[i] = timer_read32() - RGB_FLASH_DURATION_MS - 1;
+  }
+}
 #endif
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
