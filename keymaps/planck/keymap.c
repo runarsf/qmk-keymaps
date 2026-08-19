@@ -18,6 +18,7 @@ uint16_t muse_tempo = 50;
 uint8_t slay_counter = 0;
 uint8_t wash_counter = 0;
 uint8_t gay_counter = 0;
+uint8_t michael_counter = 0;
 #endif
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -181,6 +182,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   static uint16_t gay_word[3] = {NO_G, NO_A, NO_Y};
   static uint16_t slay_word[4] = {NO_S, NO_L, NO_A, NO_Y};
   static uint16_t wash_word[11] = {NO_P, NO_U, NO_S, NO_S, NO_Y, KC_SPC, NO_F, NO_R, NO_E, NO_S, NO_H};
+  static uint16_t michael_word[14] = {NO_C, NO_H, NO_E, NO_E, NO_S, NO_Y, KC_SPC, NO_M, NO_I, NO_C, NO_H, NO_A, NO_E, NO_L};
 
 #ifdef AUDIO_ENABLE
   static uint16_t gay_word[3] = {NO_G, NO_A, NO_Y};
@@ -188,12 +190,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   static float among_us[][2] = SONG(AMONG_US);
   static float slay_soul_sister[][2] = SONG(SLAY_SOUL_SISTER);
   static float samsung_washing_machine[][2] = SONG(SAMSUNG_WASHING_MACHINE);
+  static float cheesy_michael[][2] = SONG(CHEESY_MICHAEL);
 
   if (record->event.pressed) {
     sus_counter = (keycode == sus_word[sus_counter]) ? sus_counter+1 : 0;
     slay_counter = (keycode == slay_word[slay_counter]) ? slay_counter+1 : 0;
     gay_counter = (keycode == gay_word[gay_counter]) ? gay_counter+1 : 0;
     wash_counter = (keycode == wash_word[wash_counter]) ? wash_counter+1 : 0;
+    michael_counter = (keycode == michael_word[michael_counter]) ? michael_counter+1 : 0;
     if (sus_counter >= 3) {
       PLAY_SONG(among_us);
     }
@@ -202,6 +206,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     }
     if (wash_counter >= 11) {
       PLAY_SONG(samsung_washing_machine);
+    }
+    if (michael_counter >= 14) {
+      PLAY_SONG(cheesy_michael);
     }
   }
 #endif

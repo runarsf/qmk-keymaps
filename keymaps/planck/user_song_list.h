@@ -25,6 +25,9 @@
     M__NOTE(_REST, 96),
     Q__NOTE(_A4), Q__NOTE(_REST), Q__NOTE(_A4), B__NOTE(_D5),
 
+  #define CHEESY_MICHAEL \
+    WD_NOTE(_D6), H__NOTE(_CS6), WD_NOTE(_B5), H__NOTE(_A5), H__NOTE(_FS5), H__NOTE(_FS5), H__NOTE(_A5), H__NOTE(_FS5), WD_NOTE(_FS5), H__NOTE(_E5), W__NOTE(_D5), W__NOTE(_FS5), W__NOTE(_E5), W__NOTE(_B4), H__NOTE(_D5), H__NOTE(_FS5), H__NOTE(_E5), H__NOTE(_D5), B__NOTE(_D5),
+
   #undef RICK_ROLL
   #define RICK_ROLL \
     Q__NOTE(_F4), \
