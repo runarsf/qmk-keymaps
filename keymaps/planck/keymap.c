@@ -15,10 +15,6 @@ uint8_t last_muse_note = 0;
 uint16_t muse_counter = 0;
 uint8_t muse_offset = 70;
 uint16_t muse_tempo = 50;
-uint8_t slay_counter = 0;
-uint8_t wash_counter = 0;
-uint8_t gay_counter = 0;
-uint8_t michael_counter = 0;
 #endif
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -177,38 +173,68 @@ tap_dance_action_t tap_dance_actions[] = {
         ACTION_TAP_DANCE_FN_ADVANCED(NULL, rse_qmk_finished, rse_qmk_reset),
 };
 
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-  static uint16_t sus_word[3] = {NO_S, NO_U, NO_S};
-  static uint16_t gay_word[3] = {NO_G, NO_A, NO_Y};
-  static uint16_t slay_word[4] = {NO_S, NO_L, NO_A, NO_Y};
-  static uint16_t wash_word[11] = {NO_P, NO_U, NO_S, NO_S, NO_Y, KC_SPC, NO_F, NO_R, NO_E, NO_S, NO_H};
-  static uint16_t michael_word[14] = {NO_C, NO_H, NO_E, NO_E, NO_S, NO_Y, KC_SPC, NO_M, NO_I, NO_C, NO_H, NO_A, NO_E, NO_L};
-
 #ifdef AUDIO_ENABLE
-  static uint16_t gay_word[3] = {NO_G, NO_A, NO_Y};
-  static uint16_t slay_word[4] = {NO_S, NO_L, NO_A, NO_Y};
-  static float among_us[][2] = SONG(AMONG_US);
-  static float slay_soul_sister[][2] = SONG(SLAY_SOUL_SISTER);
-  static float samsung_washing_machine[][2] = SONG(SAMSUNG_WASHING_MACHINE);
-  static float cheesy_michael[][2] = SONG(CHEESY_MICHAEL);
+// Typing `word` anywhere can play a song and/or flash an RGB layer. To add
+// one: define the melody in user_song_list.h (if it plays a song), declare
+// the trigger word below, and add one WORD_SONG() / WORD_RGB() /
+// WORD_SONG_RGB() entry to word_triggers[].
+typedef struct {
+  const uint16_t *word;
+  uint8_t word_length;
+  float (*song)[2];    // NULL if this word doesn't play a song
+  uint16_t song_length;
+  uint8_t rgb_layer;   // layer to flash, or NO_RGB_LAYER
+} word_trigger_t;
 
+#define COUNT_OF(x) (sizeof(x) / sizeof((x)[0]))
+#define NO_RGB_LAYER 0xFF
+#define RGB_FLASH_DURATION_MS 1000
+
+#define WORD_SONG(word, song) {word, COUNT_OF(word), song, COUNT_OF(song), NO_RGB_LAYER}
+#define WORD_RGB(word, layer) {word, COUNT_OF(word), NULL, 0, layer}
+#define WORD_SONG_RGB(word, song, layer) {word, COUNT_OF(word), song, COUNT_OF(song), layer}
+
+static const uint16_t sus_word[] = {NO_S, NO_U, NO_S};
+static const uint16_t gay_word[] = {NO_G, NO_A, NO_Y};
+static const uint16_t slay_word[] = {NO_S, NO_L, NO_A, NO_Y};
+static const uint16_t wash_word[] = {NO_P, NO_U, NO_S, NO_S, NO_Y, KC_SPC,
+                                      NO_F, NO_R, NO_E, NO_S, NO_H};
+static const uint16_t michael_word[] = {NO_C, NO_H, NO_E, NO_E, NO_S, NO_Y, KC_SPC,
+                                         NO_M, NO_I, NO_C, NO_H, NO_A, NO_E, NO_L};
+
+static float among_us[][2] = SONG(AMONG_US);
+static float slay_soul_sister[][2] = SONG(SLAY_SOUL_SISTER);
+static float samsung_washing_machine[][2] = SONG(SAMSUNG_WASHING_MACHINE);
+static float cheesy_michael[][2] = SONG(CHEESY_MICHAEL);
+
+static const word_trigger_t word_triggers[] = {
+    WORD_SONG_RGB(sus_word, among_us, SUS),
+    WORD_SONG(gay_word, slay_soul_sister),
+    WORD_SONG(slay_word, slay_soul_sister),
+    WORD_SONG(wash_word, samsung_washing_machine),
+    WORD_SONG(michael_word, cheesy_michael),
+};
+
+static uint8_t word_trigger_progress[COUNT_OF(word_triggers)] = {0};
+static uint32_t word_trigger_rgb_hit[COUNT_OF(word_triggers)] = {0};
+#endif
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+#ifdef AUDIO_ENABLE
   if (record->event.pressed) {
-    sus_counter = (keycode == sus_word[sus_counter]) ? sus_counter+1 : 0;
-    slay_counter = (keycode == slay_word[slay_counter]) ? slay_counter+1 : 0;
-    gay_counter = (keycode == gay_word[gay_counter]) ? gay_counter+1 : 0;
-    wash_counter = (keycode == wash_word[wash_counter]) ? wash_counter+1 : 0;
-    michael_counter = (keycode == michael_word[michael_counter]) ? michael_counter+1 : 0;
-    if (sus_counter >= 3) {
-      PLAY_SONG(among_us);
-    }
-    if (gay_counter >= 3 || slay_counter >= 4) {
-      PLAY_SONG(slay_soul_sister);
-    }
-    if (wash_counter >= 11) {
-      PLAY_SONG(samsung_washing_machine);
-    }
-    if (michael_counter >= 14) {
-      PLAY_SONG(cheesy_michael);
+    for (uint8_t i = 0; i < COUNT_OF(word_triggers); i++) {
+      const word_trigger_t *trigger = &word_triggers[i];
+      uint8_t *progress = &word_trigger_progress[i];
+      *progress = (keycode == trigger->word[*progress]) ? *progress + 1 : 0;
+      if (*progress >= trigger->word_length) {
+        if (trigger->song) {
+          audio_play_melody((float (*)[][2])trigger->song, trigger->song_length, false);
+        }
+        if (trigger->rgb_layer != NO_RGB_LAYER) {
+          word_trigger_rgb_hit[i] = timer_read32();
+        }
+        *progress = 0;
+      }
     }
   }
 #endif
@@ -223,15 +249,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       set_mods(saved_mods);
       return false;
     }
-  }
-
-  if (record->event.pressed) {
-    sus_counter = (keycode == sus_word[sus_counter]) ? sus_counter + 1 : 0;
-#ifdef AUDIO_ENABLE
-    if (sus_counter >= 3) {
-      PLAY_SONG(among_us);
-    }
-#endif
   }
 
   return true;
@@ -343,9 +360,15 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
 
   set_layer_colors(current_layer);
 
-  if (sus_counter >= 3) {
-    set_layer_colors(SUS);
+#ifdef AUDIO_ENABLE
+  for (uint8_t i = 0; i < COUNT_OF(word_triggers); i++) {
+    const word_trigger_t *trigger = &word_triggers[i];
+    if (trigger->rgb_layer != NO_RGB_LAYER &&
+        timer_elapsed32(word_trigger_rgb_hit[i]) < RGB_FLASH_DURATION_MS) {
+      set_layer_colors(trigger->rgb_layer);
+    }
   }
+#endif
 
   return false;
 }
